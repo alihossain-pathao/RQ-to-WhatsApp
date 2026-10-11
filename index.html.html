@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QR to WhatsApp</title>
+<style>
+:root{--bg:#eef3f0;--card:#fff;--text:#10201a;--muted:#62736a;--g1:#25d366;--g2:#0e8f4b;--border:#e1e9e4;--chip:#e6f7ec;--chipt:#0e8f4b;--shadow:0 8px 30px rgba(16,60,40,.10);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b110e;--card:#151e19;--text:#e9f2ed;--muted:#8fa196;--border:#25322b;--chip:#173324;--chipt:#4be08a;--shadow:0 8px 30px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#0b110e;--card:#151e19;--text:#e9f2ed;--muted:#8fa196;--border:#25322b;--chip:#173324;--chipt:#4be08a;--shadow:0 8px 30px rgba(0,0,0,.4)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100%}
+.hero{background:linear-gradient(135deg,var(--g2),var(--g1));color:#fff;padding:28px 20px 70px;border-radius:0 0 32px 32px}
+.hero .in{max-width:460px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.2);display:grid;place-items:center}
+.hero h1{margin:0;font-size:1.3rem;letter-spacing:.2px}
+.hero p{margin:2px 0 0;font-size:.85rem;opacity:.9}
+.wrap{max-width:460px;margin:-48px auto 0;padding:0 16px 32px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+.stage{position:relative;aspect-ratio:1;border-radius:18px;overflow:hidden;background:linear-gradient(160deg,#0f2a1d,#0a1812);display:grid;place-items:center}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.idle{display:flex;flex-direction:column;align-items:center;gap:10px;color:#cfeedd;text-align:center;padding:20px}
+.idle svg{opacity:.9}
+.idle span{font-size:.9rem;opacity:.85}
+.frame{position:absolute;inset:16%;display:none;pointer-events:none}
+.frame i{position:absolute;width:34px;height:34px;border:4px solid var(--g1)}
+.frame i:nth-child(1){top:0;left:0;border-right:0;border-bottom:0;border-radius:14px 0 0 0}
+.frame i:nth-child(2){top:0;right:0;border-left:0;border-bottom:0;border-radius:0 14px 0 0}
+.frame i:nth-child(3){bottom:0;left:0;border-right:0;border-top:0;border-radius:0 0 0 14px}
+.frame i:nth-child(4){bottom:0;right:0;border-left:0;border-top:0;border-radius:0 0 14px 0}
+.frame b{position:absolute;left:6%;right:6%;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--g1),transparent);box-shadow:0 0 14px var(--g1);animation:scan 2s ease-in-out infinite}
+@keyframes scan{0%,100%{top:6%}50%{top:92%}}
+.stage.live video,.stage.live .frame{display:block}
+.stage.live .idle{display:none}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;border:0;border-radius:16px;font-size:1rem;font-weight:700;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--g2),var(--g1));margin-top:14px;box-shadow:0 6px 16px rgba(37,211,102,.35);transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.sec{display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 8px;border:1px solid var(--border);border-radius:16px;font-size:.82rem;font-weight:600;color:var(--text);cursor:pointer;background:var(--card);text-align:center}
+.sec span{font-size:1.3rem}
+.note{color:var(--muted);font-size:.84rem;margin-top:10px;min-height:1em;text-align:center}
+.note.err{color:#d6453a}
+#result{display:none;animation:up .3s ease}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.ok{display:flex;align-items:center;gap:10px;font-weight:700}
+.tick{width:34px;height:34px;border-radius:50%;background:var(--chip);color:var(--chipt);display:grid;place-items:center;font-size:1.1rem}
+.chip{margin-left:auto;font-size:.72rem;font-weight:700;background:var(--chip);color:var(--chipt);padding:5px 10px;border-radius:99px}
+.content{word-break:break-all;background:var(--bg);border:1px dashed var(--border);border-radius:14px;padding:12px;font-size:.88rem;margin:12px 0 0;max-height:110px;overflow:auto}
+.wa{background:#25d366;color:#052414;font-size:1.08rem}
+.wa svg{fill:#052414}
+.ghost{display:flex;gap:10px;margin-top:10px}
+.ghost button{flex:1;padding:12px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:600;font-size:.9rem;cursor:pointer}
+.grp{width:100%;margin-top:10px;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:600;font-size:.92rem;cursor:pointer}
+.hint{color:var(--muted);font-size:.78rem;text-align:center;margin-top:8px;line-height:1.4}
+.man{margin-top:12px;font-size:.85rem;color:var(--muted)}.man summary{cursor:pointer;text-align:center}
+.man input{width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem}
+.diag{font-size:.72rem;color:var(--muted);text-align:center;margin-top:6px}
+h3{margin:0 0 8px;font-size:.95rem}
+.hist{display:flex;flex-direction:column;gap:8px}
+.hist button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;font-size:.84rem}
+.hist button em{font-style:normal;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist small{color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(40px);background:#111;color:#fff;padding:10px 18px;border-radius:99px;font-size:.88rem;opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div class="hero"><div class="in">
+  <div class="logo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/><path d="M13 13h4v4"/></svg></div>
+  <div><h1>QR to WhatsApp</h1><p>Scan a QR code or barcode and open WhatsApp in one tap</p></div>
+</div></div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="stage" id="stage">
+      <video id="video" playsinline muted></video>
+      <div class="frame"><i></i><i></i><i></i><i></i><b></b></div>
+      <div class="idle">
+        <svg width="84" height="84" viewBox="0 0 24 24" fill="none" stroke="#7be0a6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/><path d="M13 13h4v4"/></svg>
+        <span>Keep the QR code or barcode inside the frame</span>
+      </div>
+    </div>
+    <button class="btn" id="startBtn">📷 &nbsp;Start scanning</button>
+    <div class="row">
+      <label class="sec" for="shot"><span>📸</span>Take a photo</label>
+      <label class="sec" for="file"><span>🖼️</span>From gallery</label>
+    </div>
+    <input type="file" id="shot" accept="image/*" capture="environment" hidden>
+    <input type="file" id="file" accept="image/*" hidden>
+    <div class="note" id="status"></div>
+    <details class="man"><summary>Scan not working? Type the ID manually</summary><input id="manual" placeholder="Enter ID or text"><button class="grp" id="manualBtn">Continue</button></details>
+    <div class="diag" id="diag"></div>
+  </div>
+
+  <div class="card" id="result">
+    <div class="ok"><div class="tick">✓</div><span>Scanned successfully</span><div class="chip" id="chip"></div></div>
+    <div class="content" id="content"></div>
+    <button class="btn wa" id="waBtn">
+      <svg width="24" height="24" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      <span id="waLabel">Send</span>
+    </button>
+    <button class="grp" id="grpBtn">✍️ Send with ID typed (choose group)</button>
+    <div class="hint" id="hint">Green button: opens your group and copies the ID, then Paste. Second button: ID is typed for you, you just pick the group.</div>
+    <div class="ghost"><button id="copyBtn">📋 Copy</button><button id="againBtn">🔄 Scan again</button></div>
+  </div>
+
+  <div class="card" id="histCard" style="display:none">
+    <h3>Recent scans</h3>
+    <div class="hist" id="hist"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js" onerror="var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/zxing-library/0.21.3/index.min.js';document.head.appendChild(s)"></script>
+<script>
+const $ = id => document.getElementById(id);
+const video = $('video'), stage = $('stage'), status = $('status');
+// ====== PERMANENT WHATSAPP GROUP LINK: paste your link between the quotes ======
+const GROUP_LINK = 'https://chat.whatsapp.com/GuvtdoBtyJUKJjmUkSD5pZ'; // e.g. 'https://chat.whatsapp.com/AbCdEfGh123'
+// ================================================================================
+let stream = null, scanning = false, scanned = '', history = [];
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+const isGroup = t => /^https?:\/\/chat\.whatsapp\.com\/\S+/i.test(t.trim());
+const isLink = t => /^https?:\/\/\S+$/i.test(t.trim());
+
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+function say(m, err){ status.textContent=m; status.className='note'+(err?' err':''); }
+
+function loadHist(){ try{ history = JSON.parse(localStorage.getItem('qrhist')||'[]'); }catch(e){ history=[]; } renderHist(); }
+function saveHist(t){
+  history = [t, ...history.filter(x=>x!==t)].slice(0,5);
+  try{ localStorage.setItem('qrhist', JSON.stringify(history)); }catch(e){}
+  renderHist();
+}
+function renderHist(){
+  $('histCard').style.display = history.length ? 'block' : 'none';
+  $('hist').innerHTML = '';
+  history.forEach(t=>{
+    const b=document.createElement('button');
+    b.innerHTML = '<span>'+(isGroup(t)?'👥':isLink(t)?'🔗':'📝')+'</span><em></em><small>Open</small>';
+    b.querySelector('em').textContent=t;
+    b.onclick=()=>showResult(t,true);
+    $('hist').appendChild(b);
+  });
+}
+
+// Keep only the ID part (e.g. 'DG081026ZBSMLJ|434' -> 'DG081026ZBSMLJ')
+function cleanId(t){ return String(t).trim().split('|')[0].trim(); }
+
+function showResult(text, fromHist){
+  scanned = cleanId(text);
+  stopCam();
+  $('content').textContent = scanned;
+  const g = isGroup(scanned);
+  $('chip').textContent = g ? 'WhatsApp Group' : isLink(scanned) ? 'Link' : 'Code';
+  $('waLabel').textContent = g ? 'Open WhatsApp Group' : (GROUP_LINK ? 'Send to WhatsApp Group' : 'Send ID to WhatsApp');
+  $('grpBtn').style.display = (GROUP_LINK && !g) ? 'block' : 'none';
+  $('hint').style.display = g ? 'none' : 'block';
+  $('result').style.display = 'block';
+  $('result').scrollIntoView({behavior:'smooth', block:'center'});
+  if (navigator.vibrate) navigator.vibrate(60);
+  if (!fromHist) saveHist(scanned);
+  say('');
+}
+
+function stopCam(){
+  scanning = false;
+  if (stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  stage.classList.remove('live');
+  $('startBtn').style.display = 'flex';
+}
+
+async function startCam(){
+  $('result').style.display = 'none';
+  say('Starting camera...');
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ideal:1920}, height:{ideal:1080} } });
+    video.srcObject = stream;
+    await video.play();
+    try { const tr = stream.getVideoTracks()[0], caps = tr.getCapabilities && tr.getCapabilities();
+      if (caps && caps.focusMode && caps.focusMode.includes('continuous')) await tr.applyConstraints({ advanced:[{ focusMode:'continuous' }] }); } catch(e){}
+    stage.classList.add('live');
+    $('startBtn').style.display = 'none';
+    say('Point the camera at a QR code or barcode');
+    scanning = true;
+    requestAnimationFrame(tick);
+  }catch(e){
+    say('Live camera is not allowed. Open this link directly in your browser, or use "Take a photo".', true);
+  }
+}
+
+// ---------- Decoding engine: QR + barcodes, blurry/small codes ----------
+let zxReader = null, zxHints = null, nativeBD = null;
+function zx(){
+  if (zxReader || typeof ZXing === 'undefined') return zxReader;
+  const F = ZXing.BarcodeFormat;
+  zxHints = new Map();
+  zxHints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+  zxHints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [F.QR_CODE,F.CODE_128,F.CODE_39,F.CODE_93,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.ITF,F.CODABAR,F.DATA_MATRIX,F.PDF_417,F.AZTEC]);
+  zxReader = new ZXing.MultiFormatReader();
+  return zxReader;
+}
+function zxDecode(cv){
+  const r = zx(); if (!r) return null;
+  try {
+    const src = new ZXing.HTMLCanvasElementLuminanceSource(cv);
+    return r.decode(new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(src)), zxHints).getText();
+  } catch(e){ return null; }
+}
+async function nativeDecode(src){
+  if (!('BarcodeDetector' in window)) return null;
+  try {
+    if (!nativeBD) nativeBD = new BarcodeDetector();
+    const r = await nativeBD.detect(src);
+    return r.length ? r[0].rawValue : null;
+  } catch(e){ return null; }
+}
+function scanCanvas(cv){
+  const d = cv.getContext('2d', { willReadFrequently:true }).getImageData(0,0,cv.width,cv.height);
+  if (typeof jsQR !== 'undefined'){
+    const q = jsQR(d.data, d.width, d.height, { inversionAttempts:'attemptBoth' });
+    if (q && q.data) return q.data;
+  }
+  return zxDecode(cv);
+}
+// image enhancement (helps blurry / low-contrast / shadowed photos)
+function toGray(data){ const n=data.length/4, g=new Uint8ClampedArray(n); for(let i=0,j=0;i<n;i++,j+=4) g[i]=(data[j]*299+data[j+1]*587+data[j+2]*114)/1000; return g; }
+function stretch(g){
+  const h=new Uint32Array(256), n=g.length; for(let i=0;i<n;i++) h[g[i]]++;
+  let lo=0,hi=255,a=0; while(lo<255 && (a+=h[lo])<n*0.02) lo++; a=0; while(hi>0 && (a+=h[hi])<n*0.02) hi--;
+  if (hi-lo<20) return g;
+  const k=255/(hi-lo), o=new Uint8ClampedArray(n); for(let i=0;i<n;i++) o[i]=(g[i]-lo)*k; return o;
+}
+function adaptive(g,w,h){
+  const W=w+1, I=new Float64Array(W*(h+1));
+  for(let y=0;y<h;y++){ let row=0; for(let x=0;x<w;x++){ row+=g[y*w+x]; I[(y+1)*W+x+1]=I[y*W+x+1]+row; } }
+  const r=Math.max(8,Math.round(w/16)), o=new Uint8ClampedArray(w*h);
+  for(let y=0;y<h;y++){ const y0=Math.max(0,y-r), y1=Math.min(h,y+r+1);
+    for(let x=0;x<w;x++){ const x0=Math.max(0,x-r), x1=Math.min(w,x+r+1);
+      const sum=I[y1*W+x1]-I[y0*W+x1]-I[y1*W+x0]+I[y0*W+x0];
+      o[y*w+x] = g[y*w+x] < (sum/((x1-x0)*(y1-y0)))*0.88 ? 0 : 255; } }
+  return o;
+}
+function grayToCanvas(g,w,h){
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d'), im=x.createImageData(w,h);
+  for(let i=0,j=0;i<g.length;i++,j+=4){ im.data[j]=im.data[j+1]=im.data[j+2]=g[i]; im.data[j+3]=255; }
+  x.putImageData(im,0,0); return c;
+}
+function variant(cv,mode){
+  const d=cv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,cv.width,cv.height);
+  let g=stretch(toGray(d.data));
+  if (mode==='bin') g=adaptive(g,cv.width,cv.height);
+  return grayToCanvas(g,cv.width,cv.height);
+}
+async function tryCanvas(cv){
+  let t = await nativeDecode(cv) || scanCanvas(cv);
+  if (t) return t;
+  for (const m of ['str','bin']){
+    const v = variant(cv,m);
+    t = scanCanvas(v) || await nativeDecode(v);
+    if (t) return t;
+  }
+  return null;
+}
+function cropScaled(cv,x,y,w,h){
+  h = Math.min(h, cv.height - y); w = Math.min(w, cv.width - x);
+  const s = Math.max(1, Math.min(3, 900 / w));
+  const o = document.createElement('canvas');
+  o.width = Math.round(w*s); o.height = Math.round(h*s);
+  o.getContext('2d').drawImage(cv, x, y, w, h, 0, 0, o.width, o.height);
+  return o;
+}
+async function decodeDeep(cv, progress){
+  const W = cv.width, H = cv.height, wins = [[0,0,W,H]];
+  for (let i=0;i<5;i++) wins.push([0, H*i*0.2, W, H*0.35]);                                  // strips: barcodes
+  for (let r=0;r<3;r++) for (let c=0;c<3;c++) wins.push([W*c*0.3, H*r*0.3, W*0.4, H*0.4]);   // tiles: small QR
+  for (let i=0;i<wins.length;i++){
+    const [x,y,w,h] = wins[i];
+    const sub = i===0 ? cv : cropScaled(cv,x,y,w,h);
+    const t = await tryCanvas(sub);
+    if (t) return t;
+    if (progress) progress(Math.round((i+1)/wins.length*100));
+    await new Promise(r => setTimeout(r));
+  }
+  return null;
+}
+
+let busy = false, lastTry = 0;
+async function tick(){
+  if (!scanning) return;
+  const now = performance.now();
+  if (!busy && now - lastTry > 120 && video.readyState === video.HAVE_ENOUGH_DATA){
+    busy = true; lastTry = now;
+    try {
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+      ctx.drawImage(video,0,0);
+      const t = await nativeDecode(canvas) || scanCanvas(canvas);
+      if (t && scanning){ showResult(t); return; }
+    } catch(e){} finally { busy = false; }
+  }
+  requestAnimationFrame(tick);
+}
+
+['file','shot'].forEach(id => $(id).addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  say('Reading code...');
+  const img = new Image();
+  img.onerror = () => say('Could not open this image file.', true);
+  img.onload = async () => {
+    try {
+      const k = Math.min(1, 2000 / Math.max(img.width, img.height));
+      canvas.width = Math.round(img.width*k); canvas.height = Math.round(img.height*k);
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      URL.revokeObjectURL(img.src);
+      const t = await decodeDeep(canvas, p => say('Reading code... ' + p + '%'));
+      if (t) showResult(t); else say('No QR code or barcode found. Try a closer, sharper photo, or type the ID manually below.', true);
+    } catch(err){ say('Error: ' + (err && err.message || err), true); }
+  };
+  img.src = URL.createObjectURL(f);
+  e.target.value = '';
+}));
+
+function fbCopy(t){
+  const a = document.createElement('textarea');
+  a.value = t; a.style.position = 'fixed'; a.style.opacity = '0';
+  document.body.appendChild(a); a.select();
+  try { document.execCommand('copy'); } catch(e){}
+  a.remove();
+}
+function copyText(t){
+  try { if (navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(t).catch(()=>fbCopy(t)); return; } } catch(e){}
+  fbCopy(t);
+}
+$('grpBtn').onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(scanned), '_blank');
+$('waBtn').onclick = () => {
+  if (GROUP_LINK && !isGroup(scanned)) {
+    copyText(scanned);
+    toast('ID copied. Paste it in the group');
+    window.open(GROUP_LINK, '_blank');
+    return;
+  }
+  const url = isGroup(scanned) ? scanned : 'https://wa.me/?text=' + encodeURIComponent(scanned);
+  window.open(url, '_blank');
+};
+$('copyBtn').onclick = () => { copyText(scanned); toast('Copied ✓'); };
+$('startBtn').onclick = startCam;
+$('againBtn').onclick = startCam;
+$('manualBtn').onclick = () => { const v = $('manual').value.trim(); if (v) showResult(v); };
+function diag(){ $('diag').textContent = 'Engines: ' + [('BarcodeDetector' in window)?'Native ✓':'Native ✗', (typeof ZXing!=='undefined')?'ZXing ✓':'ZXing ✗', (typeof jsQR!=='undefined')?'jsQR ✓':'jsQR ✗'].join(' · '); }
+window.addEventListener('load', () => { diag(); setTimeout(diag, 2000); });
+loadHist();
+</script>
+</body>
+</html>
