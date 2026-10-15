@@ -10,7 +10,7 @@
 <title>Pathao Courier Panel</title>
 
 <style>
-:root{--bg:#f3f6fb;--ink:#172b4d;--navy:#102a43;--red:#e31837;--muted:#6b7c93;--card:#fff;--line:#e4eaf2;--shadow:0 12px 30px rgba(16,42,67,.07);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#f3f6fb;--ink:#172b4d;--navy:#102a43;--red:#e31837;--muted:#6b7c93;--card:#fff;--line:#e4eaf2;--shadow:0 12px 30px rgba(16,42,67,.07);box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hind Siliguri","Noto Sans Bengali","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}.wrap{max-width:1120px;margin:0 auto;padding:0 24px 36px}
 #v-home>header,#v-weekend>header,#v-qr>header{margin:22px 0 0;border-radius:22px;overflow:hidden;display:flex;align-items:center;gap:22px;padding:25px 28px;background:linear-gradient(115deg,#102a43 0%,#173e61 72%,#1c5273 100%);color:#fff;box-shadow:var(--shadow);position:relative}
 #v-home>header:after,#v-weekend>header:after,#v-qr>header:after{content:"";position:absolute;width:240px;height:240px;border:42px solid rgba(255,255,255,.055);border-radius:50%;right:-55px;top:-100px;pointer-events:none}
@@ -161,6 +161,7 @@ html.locked,html.locked body{overflow:hidden}
 .psec #logout{color:#c62828;border-color:#f3c9c9;background:#fdecec}
 #v-qr iframe{height:calc(100vh - 82px - env(safe-area-inset-top,0px));height:calc(100dvh - 82px - env(safe-area-inset-top,0px))}
 @media(max-width:760px){#v-ret{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}}
+#v-ret{background:linear-gradient(90deg,#101a2d 0%,#172b49 52%,#263c5a 100%) top left/100% env(safe-area-inset-top,0px) no-repeat}
 </style>
 <script>
 // ================= ACCESS CONFIG (owner sets this) =================
