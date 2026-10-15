@@ -143,6 +143,22 @@ html.locked,html.locked body{overflow:hidden}
 @media(max-width:480px){.who .wr{gap:4px}.who .wr button{padding:6px 8px}.who .av{width:30px;height:30px;margin-right:7px}}
 .ac{display:flex;align-items:center;gap:8px;font-style:normal;flex:none}
 .rmv{font:inherit;font-size:11px;font-weight:700;border:1px solid #f3c9c9;background:#fdecec;color:#c62828;border-radius:8px;padding:5px 9px;cursor:pointer}
+/* ---- Header profile button + profile sheet ---- */
+#v-home>header:before{right:84px}
+.hav{position:relative;z-index:2;flex:none;margin-left:auto;width:46px;height:46px;padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:linear-gradient(145deg,#f32b49,#c90d2b);color:#fff;font:inherit;font-size:18px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.hav img{width:100%;height:100%;object-fit:cover;display:block}
+.hav:active{transform:scale(.96)}
+.hav:focus-visible{outline:3px solid #ffcc4d;outline-offset:3px}
+.ph{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.pi{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pi b{font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pi span{color:var(--muted);font-size:13px}
+.pi .rb{align-self:flex-start;margin:2px 0 0}
+.pab2{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.psec{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.psec button{flex:1;font:inherit;font-size:14px;font-weight:700;border-radius:10px;padding:11px 10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.psec #admBtn{color:#1a73d9}
+.psec #logout{color:#c62828;border-color:#f3c9c9;background:#fdecec}
 </style>
 <script>
 // ================= ACCESS CONFIG (owner sets this) =================
@@ -185,9 +201,8 @@ let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch
 </div>
 <div class="wrap">
 <section id="v-home">
-<header><div class="logo"><b>pathao</b><span>courier</span></div><div class="title"><h1>Rider <em>Panel</em></h1><p>Narsingdi-Shibpur Hub</p></div></header>
+<header><div class="logo"><b>pathao</b><span>courier</span></div><div class="title"><h1>Rider <em>Panel</em></h1><p>Narsingdi-Shibpur Hub</p></div><button id="hdAv" class="hav" type="button" aria-label="Profile"></button></header>
 <div class="home">
-<div class="who"><span id="whoTxt"></span><div class="wr"><button id="profBtn" type="button">Profile</button><button id="admBtn" type="button" data-adm>⚙ Admin</button><button id="logout" type="button">Logout</button></div></div>
 <div class="today" id="today"></div>
 <div class="big3">
 <button data-v="ret" style="--b:#e11d2e"><i>📦</i>Return Parcel</button>
@@ -1044,13 +1059,12 @@ loadHist();
 <div class="acts"><button id="admClose" type="button">Close</button></div>
 </div></dialog>
 <dialog id="profDlg"><div class="m">
-<h2>Profile</h2>
-<p>Set your name and profile picture.</p>
-<div class="pa"><span class="pav" id="pAv"></span>
-<div class="pab"><label class="pbtn" for="pFile">Change photo</label><input id="pFile" type="file" accept="image/*" hidden><button type="button" class="pbtn dg" id="pRm">Remove photo</button></div></div>
+<div class="ph"><span class="pav" id="pAv"></span><div class="pi"><b id="pTitle"></b><span id="pSub"></span><i class="rb" id="pRole"></i></div></div>
+<div class="pab2"><label class="pbtn" for="pFile">Change photo</label><input id="pFile" type="file" accept="image/*" hidden><button type="button" class="pbtn dg" id="pRm">Remove photo</button></div>
 <label for="pName">Name</label><input id="pName" type="text" maxlength="40" placeholder="Your name" autocomplete="off">
 <div id="pErr" role="alert"></div>
-<div class="acts"><button id="pCancel" type="button">Cancel</button><button class="ok" id="pSave" type="button">Save</button></div>
+<div class="acts"><button id="pCancel" type="button">Close</button><button class="ok" id="pSave" type="button">Save</button></div>
+<div class="psec"><button id="admBtn" type="button" data-adm>⚙ Admin panel</button><button id="logout" type="button">Logout</button></div>
 </div></dialog>
 <div id="toast" role="status"></div>
 
@@ -1077,15 +1091,15 @@ const PHONE_RE=/^01[3-9]\d{8}$/;
 const accHash=(ph,pw)=>sha256(ACCESS_SALT+ph+":"+pw);
 const isAdmin=()=>!!user&&user.role==="admin";
 function getProf(){try{return JSON.parse(localStorage.getItem("wr-prof-"+user.phone)||"{}")||{}}catch(e){return {}}}
-function showWho(){const t=document.getElementById("whoTxt");if(!t||!user)return;
+function fillAv(el,pic,txt){el.textContent="";
+  if(pic){const im=document.createElement("img");im.alt="";im.src=pic;el.appendChild(im)}
+  else el.textContent=(txt||"?").trim().charAt(0).toUpperCase()}
+function showWho(){const h=document.getElementById("hdAv");if(!h||!user)return;
   const p=getProf(),nm=p.name||user.name||"";
-  t.textContent="";
-  const av=document.createElement("span");av.className="av";
-  if(p.pic){const im=document.createElement("img");im.alt="";im.src=p.pic;av.appendChild(im)}
-  else av.textContent=(nm||user.phone).trim().charAt(0).toUpperCase();
-  const tx=document.createElement("span");tx.className="wn";tx.textContent=nm?nm+" · "+user.phone:user.phone;
-  const b=document.createElement("b");b.className="rb"+(isAdmin()?" ad":"");b.textContent=isAdmin()?"ADMIN":"USER";
-  t.appendChild(av);t.appendChild(tx);t.appendChild(b)}
+  fillAv(h,p.pic,nm||user.phone);
+  document.getElementById("pTitle").textContent=nm||user.phone;
+  document.getElementById("pSub").textContent=user.phone;
+  const r=document.getElementById("pRole");r.className="rb"+(isAdmin()?" ad":"");r.textContent=isAdmin()?"ADMIN":"USER"}
 // Admin Access shows the admin-only controls; User Access hides them
 function applyRole(){
   const ad=isAdmin();
@@ -1119,7 +1133,7 @@ function applyRole(){
     root.classList.remove("locked");applyRole();window.scrollTo(0,0);
   });
   g("logout").onclick=()=>askConfirm("Logout?","Abar Phone ar Password diye dhukte hobe.","Yes, logout",()=>{
-    user=null;try{localStorage.removeItem("wr-user")}catch(e){}
+    const pd=document.getElementById("profDlg");if(pd&&pd.open)pd.close();user=null;try{localStorage.removeItem("wr-user")}catch(e){}
     g("gPhone").value="";g("gPass").value="";root.classList.add("locked");applyRole();
   });
 })();
@@ -1318,7 +1332,7 @@ renderHome();
     else av.textContent=nm.charAt(0).toUpperCase();
     g("pRm").hidden=!pic;
   }
-  g("profBtn").onclick=()=>{
+  g("hdAv").onclick=()=>{
     if(!user)return;
     const p=getProf();pic=p.pic||"";g("pName").value=p.name||user.name||"";g("pErr").textContent="";
     paint();dlg.showModal();
@@ -1340,6 +1354,7 @@ renderHome();
   });
   g("pRm").onclick=()=>{pic="";paint()};
   g("pCancel").onclick=()=>dlg.close();
+  g("admBtn").addEventListener("click",()=>dlg.close());
   g("pSave").onclick=()=>{
     if(!user)return;
     try{localStorage.setItem("wr-prof-"+user.phone,JSON.stringify({name:g("pName").value.trim().slice(0,40),pic:pic}))}
