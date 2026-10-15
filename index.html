@@ -1,16 +1,645 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QR to WhatsApp</title>
+<meta name="theme-color" content="#102a43">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Pathao Courier Panel</title>
+
 <style>
+:root{--bg:#f3f6fb;--ink:#172b4d;--navy:#102a43;--red:#e31837;--muted:#6b7c93;--card:#fff;--line:#e4eaf2;--shadow:0 12px 30px rgba(16,42,67,.07);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hind Siliguri","Noto Sans Bengali","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}.wrap{max-width:1120px;margin:0 auto;padding:0 24px 36px}
+#v-home>header,#v-weekend>header{margin:22px 0 0;border-radius:22px;overflow:hidden;display:flex;align-items:center;gap:22px;padding:25px 28px;background:linear-gradient(115deg,#102a43 0%,#173e61 72%,#1c5273 100%);color:#fff;box-shadow:var(--shadow);position:relative}
+#v-home>header:after,#v-weekend>header:after{content:"";position:absolute;width:240px;height:240px;border:42px solid rgba(255,255,255,.055);border-radius:50%;right:-55px;top:-100px;pointer-events:none}
+.logo{position:relative;z-index:1;min-width:76px;width:76px;height:76px;border-radius:20px;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;clip-path:none;padding:8px;box-shadow:0 8px 22px rgba(227,24,55,.24);font-style:normal}.logo b{display:block;font-size:18px;font-weight:800;line-height:1;letter-spacing:-.8px}.logo span{display:block;font-size:11px;margin:5px 0 0;letter-spacing:1.4px;text-transform:uppercase}.title{position:relative;z-index:1;flex:1;padding:0;text-align:left}.title h1{margin:0;font-size:clamp(25px,4vw,36px);font-weight:800;letter-spacing:-.8px;line-height:1.2}.title h1 em{color:#ffcc4d;font-style:normal}.title p{margin:9px 0 0;font-size:14px;font-weight:600;letter-spacing:.3px;border:0;padding:0;color:#d7e5f2;display:flex;align-items:center;gap:8px}.title p:before{content:"";width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 4px rgba(74,222,128,.14)}
+.home{padding:24px 0;display:grid;gap:22px}.today{border-radius:20px;overflow:hidden;background:var(--card);box-shadow:var(--shadow);border:1px solid var(--line)}.th{background:linear-gradient(110deg,var(--c),color-mix(in srgb,var(--c) 75%,#102a43));color:#fff;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px}.th small{display:block;font-size:12px;font-weight:600;opacity:.88;letter-spacing:.5px;text-transform:uppercase}.th b{display:block;font-size:24px;line-height:1.3;margin-top:4px}.th span{font-size:13px;font-weight:600;background:rgba(255,255,255,.15);padding:8px 12px;border:1px solid rgba(255,255,255,.18);border-radius:10px;white-space:nowrap}.tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:8px 12px}.tr div{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:16px 14px;border-right:1px solid var(--line);border-bottom:0}.tr div:last-child{border-right:0}.tr b{font-size:15px;line-height:1.35}.tr span,.mut{color:var(--muted);font-size:13px}
+.big3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.big3 button{font:inherit;text-align:left;font-weight:700;font-size:16px;line-height:1.35;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:flex-start;gap:16px;cursor:pointer;box-shadow:0 5px 16px rgba(16,42,67,.035);transition:transform .18s,box-shadow .18s,border-color .18s;min-height:148px}.big3 button:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#cbd7e5}.big3 button i{font-style:normal;font-size:24px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--b) 10%,white);border-radius:15px}.big3 button:after{content:"Open tool  ↗";font-size:12px;font-weight:600;color:var(--muted);margin-top:auto}.big3 button:focus-visible,.back button:focus-visible,.lh button:focus-visible{outline:3px solid #ffcc4d;outline-offset:3px}
+.log{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 22px;box-shadow:var(--shadow)}.lh{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}.lh h2{margin:0;font-size:18px;font-weight:800}.lh button{font:inherit;font-size:12px;font-weight:700;border:1px solid var(--line);background:#f8fafc;color:var(--muted);border-radius:9px;padding:8px 12px;cursor:pointer}.lg{padding:13px 0;border-bottom:1px solid var(--line);font-size:14px}.lg:last-child{border:0}.lg b{font-weight:700}
+.back{display:flex;align-items:center;gap:14px;padding:14px 0;background:transparent;color:var(--ink);position:sticky;top:env(safe-area-inset-top,0px);z-index:5;border-bottom:1px solid var(--line);margin-bottom:8px}.back b{font-size:17px}.back button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 14px;background:var(--navy);color:#fff;cursor:pointer}.frm iframe{display:block;width:100%;height:calc(100vh - 70px - env(safe-area-inset-top,0px));height:calc(100dvh - 70px - env(safe-area-inset-top,0px));border:1px solid var(--line);border-radius:18px;background:var(--bg);box-shadow:var(--shadow)}
+.list{padding:20px 0;display:grid;gap:14px}.day{display:grid;grid-template-columns:88px 1.2fr 1fr;border-radius:18px;overflow:hidden;background:var(--card);position:relative;border:1px solid var(--line);box-shadow:0 5px 18px rgba(16,42,67,.045)}.day.today{outline:2px solid var(--c);outline-offset:2px}.lab{grid-row:1/3;background:var(--c);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;font-size:12px;line-height:1.4}.lab b{font-size:18px}.hd{background:#f5f8fc;color:var(--muted);font-weight:800;padding:12px 13px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--line)}.hd.right{background:color-mix(in srgb,var(--c) 10%,white);color:var(--ink);text-align:left}.col{padding:4px 13px;font-weight:600;font-size:13px}.col div{padding:10px 0;border-bottom:1px solid var(--line);min-height:39px;display:flex;align-items:center}.col div:last-child{border:0}.names{grid-column:2;background:var(--card)}.roads{grid-column:3;background:var(--card);color:var(--muted)}.hd.n{grid-column:2}.hd.r{grid-column:3}.hd.right{grid-column:4}.dayname{grid-column:2/4;grid-row:3;display:flex;flex-direction:row;align-items:center;justify-content:space-between;border-top:1px solid var(--line);gap:10px;text-align:left;font-weight:700;padding:14px;background:color-mix(in srgb,var(--c) 5%,white)}.badge{background:var(--c);color:#fff;font-size:11px;padding:4px 9px;border-radius:99px}.ex{font:inherit;font-size:12px;font-weight:700;border:0;border-radius:9px;padding:9px 11px;background:var(--navy);color:#fff;cursor:pointer}.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 0 24px;color:var(--muted);font-size:13px}.foot button{background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:8px 12px;font:inherit;font-size:12px;cursor:pointer}
+dialog{border:1px solid var(--line);border-radius:22px;padding:0;width:min(92vw,440px);background:var(--card);color:var(--ink);box-shadow:0 24px 80px rgba(16,42,67,.25)}dialog::backdrop{background:rgba(8,25,44,.55);backdrop-filter:blur(4px)}.m{padding:24px}.m h2{margin:0 0 5px;font-size:21px}.m p{margin:0 0 18px;color:var(--muted);font-size:14px}.m label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}.m select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}.sum{margin-top:16px;padding:13px;border-radius:12px;background:#fff3f4;border:1px solid #ffd6dc;font-size:14px;min-height:44px}.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}.acts button{font:inherit;font-weight:700;border-radius:10px;padding:10px 15px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}.acts .ok{background:var(--red);border-color:var(--red);color:#fff}.acts .ok:disabled{opacity:.4;cursor:not-allowed}#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:99}#toast.on{opacity:1}
+[hidden]{display:none!important}button,select{font-family:inherit}button{touch-action:manipulation}
+@media(max-width:700px){.wrap{padding:0 14px 24px}#v-home>header,#v-weekend>header{margin-top:14px;padding:20px 18px;border-radius:18px;gap:14px}.logo{width:60px;height:60px;min-width:60px;border-radius:16px}.logo b{font-size:15px}.logo span{font-size:9px}.title h1{font-size:25px}.title p{font-size:12px}.home{padding:18px 0;gap:16px}.th{padding:18px}.th b{font-size:21px}.tr{grid-template-columns:1fr;padding:4px 14px}.tr div{flex-direction:row;align-items:center;justify-content:space-between;border-right:0;border-bottom:1px solid var(--line);padding:12px 4px}.tr div:last-child{border-bottom:0}.tr b{text-align:right}.big3{gap:9px}.big3 button{padding:13px 11px;min-height:130px;font-size:13px;border-radius:14px;gap:11px}.big3 button i{width:42px;height:42px;font-size:21px;border-radius:12px}.big3 button:after{font-size:10px}.log{padding:16px;border-radius:16px}.day{grid-template-columns:56px minmax(0,1.1fr) minmax(0,.8fr)}.day .lab{grid-row:1/3}.day .hd.n{grid-column:2}.day .hd.r{grid-column:3}.day .hd.right{display:none}.day .names{grid-column:2}.day .roads{grid-column:3}.day .dayname{grid-column:2/4;grid-row:3;flex-direction:row;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line)}.hd{padding:10px 8px;font-size:10px}.col{padding:3px 8px;font-size:12px}.col div{padding:9px 0;min-height:36px}.lab{font-size:10px}.lab b{font-size:15px}.ex{font-size:11px;padding:8px}.foot{font-size:11px}.back{padding:12px 0}.frm iframe{height:calc(100dvh - 64px - env(safe-area-inset-top,0px))}}
+@media(max-width:390px){.wrap{padding-left:10px;padding-right:10px}.title h1{font-size:22px}.logo{width:52px;min-width:52px;height:52px}.big3{grid-template-columns:1fr;gap:8px}.big3 button{min-height:0;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:12px;padding:12px 14px}.big3 button:after{content:"Open ↗"}.day{grid-template-columns:48px minmax(0,1fr) minmax(0,.8fr)}}
+
+/* Premium dashboard redesign v2 */
+:root{--bg:#f4f6fb;--ink:#142238;--navy:#111c31;--red:#e31837;--muted:#718096;--card:#ffffff;--line:#e7ebf2;--shadow:0 18px 45px rgba(20,34,56,.075)}
+html{background:var(--bg);scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at 85% 0%,rgba(227,24,55,.07),transparent 28%),linear-gradient(180deg,#f8f9fc 0%,#f1f4f9 100%);min-height:100vh}
+.wrap{max-width:1240px;padding:0 32px 48px}
+#v-home>header,#v-weekend>header{margin-top:28px;min-height:210px;padding:34px 38px;border-radius:28px;background:linear-gradient(118deg,#101a2d 0%,#172b49 52%,#263c5a 100%);box-shadow:0 24px 55px rgba(17,28,49,.18);gap:26px;isolation:isolate}
+#v-home>header:before,#v-weekend>header:before{content:"OPERATIONS WORKSPACE";position:absolute;top:27px;right:34px;color:rgba(255,255,255,.44);font-size:10px;font-weight:800;letter-spacing:2.5px}
+#v-home>header:after,#v-weekend>header:after{width:340px;height:340px;border:1px solid rgba(255,255,255,.09);right:-80px;top:-160px;box-shadow:0 0 0 35px rgba(255,255,255,.025),0 0 0 75px rgba(255,255,255,.02);z-index:-1}
+.logo{width:88px;height:88px;min-width:88px;border-radius:25px;background:linear-gradient(145deg,#f32b49,#c90d2b);box-shadow:0 13px 28px rgba(227,24,55,.32),inset 0 1px 0 rgba(255,255,255,.28);transform:rotate(-3deg)}
+.logo b{font-size:20px;letter-spacing:-1.1px}.logo span{font-size:10px;letter-spacing:2px}
+.title h1{font-size:clamp(32px,4.4vw,48px);letter-spacing:-1.7px;font-weight:850;line-height:1.08}
+.title h1 em{color:#ff526b}
+.title p{margin-top:16px;font-size:14px;letter-spacing:.5px;color:#d6e0ef}
+.title p:before{width:9px;height:9px;box-shadow:0 0 0 5px rgba(74,222,128,.12)}
+.home{padding:28px 0 22px;gap:24px}
+.today{border:1px solid rgba(218,225,236,.9);border-radius:24px;box-shadow:0 10px 35px rgba(20,34,56,.055);overflow:hidden}
+.th{padding:24px 28px;background:linear-gradient(105deg,var(--c),color-mix(in srgb,var(--c) 78%,#101a2d));position:relative;isolation:isolate}
+.th:after{content:"";position:absolute;width:150px;height:150px;border:24px solid rgba(255,255,255,.09);border-radius:50%;right:-25px;top:-75px;z-index:-1}
+.th small{font-size:11px;letter-spacing:1.6px;font-weight:800}.th b{font-size:27px;letter-spacing:-.5px;margin-top:7px}.th span{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.25);border-radius:12px;padding:10px 14px;font-size:12px;backdrop-filter:blur(8px)}
+.tr{padding:10px 18px}.tr div{padding:19px 18px;gap:7px}.tr b{font-size:15px;font-weight:750}.tr span{font-size:12px;letter-spacing:.2px}
+.big3{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.big3 button{position:relative;isolation:isolate;overflow:hidden;min-height:190px;padding:24px;border-radius:23px;border:1px solid #e8edf4;box-shadow:0 8px 25px rgba(20,34,56,.045);font-size:17px;font-weight:800;letter-spacing:-.25px;gap:18px;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.big3 button:before{content:"";position:absolute;right:-38px;top:-46px;width:125px;height:125px;border-radius:40px;background:color-mix(in srgb,var(--b) 7%,transparent);transform:rotate(25deg);z-index:-1;transition:transform .25s ease}
+.big3 button:hover{transform:translateY(-5px);box-shadow:0 18px 38px rgba(20,34,56,.1);border-color:color-mix(in srgb,var(--b) 32%,white)}
+.big3 button:hover:before{transform:rotate(40deg) scale(1.16)}
+.big3 button i{width:58px;height:58px;font-size:27px;border-radius:18px;background:color-mix(in srgb,var(--b) 11%,white);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--b) 9%,white)}
+.big3 button:after{content:"OPEN WORKSPACE  ↗";font-size:10px;letter-spacing:1.15px;font-weight:800;color:var(--b);margin-top:auto;opacity:.86}
+.log{padding:24px 28px;border-radius:23px;border-color:#e8edf4;box-shadow:0 10px 32px rgba(20,34,56,.045)}
+.lh{margin-bottom:14px}.lh h2{font-size:19px;letter-spacing:-.3px}.lh button{padding:9px 14px;border-radius:10px;transition:background .2s,color .2s}.lh button:hover{background:#fff0f2;color:var(--red)}
+.lg{padding:15px 2px;font-size:14px;line-height:1.6}.lg:last-child{padding-bottom:2px}
+.back{padding:14px 0 18px;background:rgba(244,246,251,.88);backdrop-filter:blur(12px)}
+.back button{background:var(--navy);border-radius:11px;padding:11px 16px;box-shadow:0 5px 12px rgba(17,28,49,.13)}
+.frm iframe{border-radius:22px;box-shadow:0 14px 38px rgba(20,34,56,.08)}
+.day{border-radius:20px;box-shadow:0 8px 25px rgba(20,34,56,.045);transition:box-shadow .2s,transform .2s}.day:hover{box-shadow:0 14px 32px rgba(20,34,56,.085);transform:translateY(-1px)}
+.hd{padding:14px;font-size:11px;letter-spacing:1px}.col{font-size:13px}.col div{min-height:43px}
+.ex{border-radius:10px;padding:10px 13px;transition:transform .15s,opacity .15s}.ex:hover{transform:translateY(-1px);opacity:.92}
+.foot{padding-top:8px}
+button:focus-visible{outline:3px solid rgba(227,24,55,.3);outline-offset:3px}
+@media(max-width:760px){.wrap{padding:0 16px 28px}#v-home>header,#v-weekend>header{margin-top:16px;min-height:175px;padding:28px 22px;border-radius:23px;gap:17px}#v-home>header:before,#v-weekend>header:before{top:15px;right:18px;font-size:8px;letter-spacing:1.4px}.logo{width:64px;height:64px;min-width:64px;border-radius:19px}.logo b{font-size:15px}.logo span{font-size:8px;letter-spacing:1.2px}.title h1{font-size:clamp(25px,6vw,34px);letter-spacing:-.8px}.title p{margin-top:11px;font-size:12px}.home{padding:19px 0;gap:17px}.th{padding:19px 20px}.th b{font-size:22px}.th span{font-size:10px;padding:8px 9px}.tr{padding:5px 15px}.tr div{padding:13px 3px}.big3{gap:10px}.big3 button{min-height:152px;padding:15px 12px;border-radius:17px;font-size:13px;gap:12px}.big3 button i{width:43px;height:43px;font-size:21px;border-radius:13px}.big3 button:after{font-size:8px;letter-spacing:.5px}.log{padding:18px;border-radius:18px}.lh h2{font-size:16px}.lg{font-size:13px;padding:12px 0}.day{border-radius:15px}.hd{padding:10px 8px;font-size:10px}.col{padding:4px 8px;font-size:12px}.col div{min-height:38px}.frm iframe{border-radius:16px}}
+@media(max-width:390px){.wrap{padding-left:11px;padding-right:11px}#v-home>header,#v-weekend>header{padding:25px 15px;gap:12px}.logo{width:54px;height:54px;min-width:54px;border-radius:16px}.title h1{font-size:24px}.title p{font-size:11px}.big3{gap:7px}.big3 button{padding:12px 9px;font-size:12px;min-height:140px}.big3 button i{width:38px;height:38px;font-size:19px}.big3 button:after{font-size:7px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media(max-width:760px){.day .lab{padding:8px 4px;overflow:hidden}.day .lab b{writing-mode:vertical-rl;transform:rotate(180deg);font-size:15px;letter-spacing:.6px;white-space:nowrap;max-height:100%}}
+.thr{display:flex;flex-direction:column;align-items:flex-end;gap:8px}.exh{font:inherit;font-size:12px;font-weight:800;border:0;border-radius:10px;padding:9px 12px;background:#fff;color:var(--c);cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}.exh:active{transform:scale(.97)}
+.col input{width:100%;min-width:0;font:inherit;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 9px}.col input:focus{outline:2px solid var(--c);outline-offset:0}.col div:has(.del){gap:6px}.del{flex:none;width:28px;height:28px;border:0;border-radius:8px;background:#fdecec;color:#c62828;font-size:13px;cursor:pointer}.add{font:inherit;font-size:12px;font-weight:700;border:1px dashed var(--c);background:transparent;color:var(--c);border-radius:9px;padding:8px 12px;cursor:pointer}#editBtn{background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:8px 12px;font:inherit;font-size:12px;cursor:pointer}
+.exh.adv{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.4);box-shadow:none}
+#v-home>header,#v-weekend>header{min-height:0;margin-top:12px;padding:16px 20px;border-radius:18px;gap:14px}
+#v-home>header:before,#v-weekend>header:before{top:10px;right:16px;font-size:8px;letter-spacing:1.6px}
+#v-home>header:after,#v-weekend>header:after{width:200px;height:200px;top:-100px;right:-60px}
+.logo{width:52px;height:52px;min-width:52px;border-radius:15px}
+.logo b{font-size:13px;letter-spacing:-.6px}.logo span{font-size:7px;letter-spacing:1.2px;margin-top:3px}
+.title h1{font-size:clamp(20px,5vw,26px);letter-spacing:-.6px}
+.title p{margin-top:6px;font-size:11.5px}.title p:before{width:7px;height:7px;box-shadow:0 0 0 3px rgba(74,222,128,.12)}
+.th{flex-wrap:wrap;padding:14px 16px;row-gap:12px}
+.th b{font-size:22px;margin-top:2px}.th small{font-size:10px;letter-spacing:1.4px}
+.th span{font-size:11px;padding:6px 10px}
+.thr{flex:1 1 100%;flex-direction:row;align-items:stretch;gap:8px}
+.thr .exh{flex:1 1 0;min-width:0;text-align:center;font-size:12px;padding:9px 8px}
+#v-ret .frm iframe,#v-ret iframe{height:100vh;height:100dvh;border-radius:0;box-shadow:none}
+#cfm{border:0;border-radius:20px;padding:0;width:min(340px,calc(100% - 32px));box-shadow:0 24px 60px rgba(16,42,67,.3);color:var(--ink)}
+#cfm::backdrop{background:rgba(16,24,40,.55)}
+#cfm .cfm{padding:24px 20px;text-align:center}#cfm h2{margin:0 0 8px;font-size:18px}#cfm p{margin:0 0 18px;font-size:13px;color:var(--muted);line-height:1.5}
+#cfm .acts{display:flex;gap:10px}#cfm .acts button{flex:1;height:44px;border:0;border-radius:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;background:#eef2f7;color:var(--ink)}
+#cfm .acts .danger{background:#dc2626;color:#fff}
+html,body{overscroll-behavior-y:none}
+#v-home>header,#v-weekend>header{position:sticky;top:0;z-index:40;margin-top:0;border-radius:0 0 20px 20px;padding:calc(env(safe-area-inset-top,0px) + 14px) 20px 14px}
+#v-home>header:before,#v-weekend>header:before{top:calc(env(safe-area-inset-top,0px) + 10px)}
+@media(max-width:760px){#v-home>header,#v-weekend>header{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding-left:18px;padding-right:18px}#v-home>.home{padding-top:16px}}
+#v-ret{padding-top:env(safe-area-inset-top,0px)}
+#v-ret iframe{height:calc(100vh - env(safe-area-inset-top,0px));height:calc(100dvh - env(safe-area-inset-top,0px))}
+
+/* ---- Login gate ---- */
+#gate{display:none;position:fixed;inset:0;z-index:99999;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 18px);background:linear-gradient(118deg,#101a2d 0%,#172b49 55%,#263c5a 100%);overflow-y:auto}
+html.locked #gate{display:flex}
+html.locked .wrap,html.locked dialog,html.locked #toast{display:none!important}
+html.locked,html.locked body{overflow:hidden}
+#gate .gc{margin:auto;width:100%;max-width:400px;background:#fff;border-radius:22px;padding:26px 22px 22px;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+#gate .gl{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+#gate .gl .lg2{width:54px;height:54px;border-radius:15px;background:var(--red);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;line-height:1}
+#gate .gl .lg2 b{font-size:14px}#gate .gl .lg2 span{font-size:8px;letter-spacing:1px;margin-top:3px;opacity:.9}
+#gate h2{margin:0;font-size:21px;color:var(--navy)}#gate p.sb{margin:3px 0 0;font-size:12.5px;color:var(--muted)}
+#gate label{display:block;margin:13px 0 6px;font-size:12px;font-weight:700;color:var(--navy)}
+#gate input{width:100%;font:inherit;font-size:16px;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:#f8fafd;color:var(--ink);outline:0}
+#gate input:focus{border-color:#1a73d9;background:#fff}
+#gate .pw{position:relative}#gate .pw input{padding-right:64px}
+#gate .pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#1a73d9;font:inherit;font-size:12px;font-weight:700;padding:8px 10px;cursor:pointer}
+#gate .err{min-height:18px;margin:10px 0 0;font-size:12.5px;color:#d0192f;font-weight:600}
+#gate .go{width:100%;margin-top:6px;border:0;border-radius:13px;padding:14px;font:inherit;font-size:15px;font-weight:800;color:#fff;background:var(--red);cursor:pointer}
+#gate .go:active{transform:scale(.99)}
+#gate .adm{display:none;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
+#gate .adm.on{display:block}
+#gate .adm h3{margin:0 0 2px;font-size:14px;color:var(--navy)}
+#gate .adm p{margin:0 0 4px;font-size:11.5px;color:var(--muted)}
+#gate .adm textarea{width:100%;min-height:74px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;padding:10px;border:1.5px solid var(--line);border-radius:12px;background:#f8fafd;color:var(--ink);resize:vertical;margin-top:10px}
+#gate .adm .go{background:var(--navy);padding:11px;font-size:13px}
+.who{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;color:var(--ink)}
+.who span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who button{flex:none;border:1px solid var(--line);background:#fff;color:var(--red);font:inherit;font-size:12px;font-weight:700;border-radius:10px;padding:6px 11px;cursor:pointer}
+</style>
+<script>
+// ================= ACCESS CONFIG (owner sets this) =================
+// Add one line per rider:  {phone:"01XXXXXXXXX", name:"Optional name", hash:"..."},
+// hash = SHA-256 of  ACCESS_SALT + phone + ":" + password
+// Easy way to make a line: open this file with  #admin  at the end of the address, fill Phone + Password, copy the line.
+// To remove a rider's access: delete their line. To change a password: replace their hash.
+const ACCESS_SALT="pathao-nsd:";
+const ACCOUNTS=[
+  {phone:"01700000000",name:"Demo Rider",hash:"2d3eaab2c91d8856ee883be060a209d9cbd26f00f679c9c9b490e3520046013d"}, // DEMO (password: pathao123) -- DELETE THIS LINE
+];
+// ===================================================================
+const findAcc=ph=>ACCOUNTS.find(a=>a.phone===ph);
+let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch(e){}
+(function(){
+  const a=user&&findAcc(user.phone);
+  if(!a||a.hash!==user.h){user=null;try{localStorage.removeItem("wr-user")}catch(e){}document.documentElement.classList.add("locked")}
+  if(location.hash==="#admin")document.documentElement.classList.add("locked");
+})();
+</script>
+</head>
+<body>
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gT">
+<div class="gc">
+<div class="gl"><div class="lg2"><b>pathao</b><span>courier</span></div><div><h2 id="gT">Rider Login</h2><p class="sb">Narsingdi-Shibpur Hub</p></div></div>
+<form id="gForm" autocomplete="on" novalidate>
+<label for="gPhone">Phone Number</label>
+<input id="gPhone" name="username" type="tel" inputmode="numeric" autocomplete="username" placeholder="01XXXXXXXXX">
+<label for="gPass">Password</label>
+<div class="pw"><input id="gPass" name="password" type="password" autocomplete="current-password" placeholder="Password"><button type="button" id="gEye">Show</button></div>
+<div class="err" id="gErr" role="alert"></div>
+<button class="go" type="submit">Login</button>
+</form>
+<div class="adm" id="gAdm">
+<h3>Admin: rider add korun</h3><p>Phone, password (ar chaile name) diye line banan, tarpor config e paste korun.</p>
+<label for="aPhone">Phone</label><input id="aPhone" type="tel" inputmode="numeric" placeholder="01XXXXXXXXX" autocomplete="off">
+<label for="aName">Name (optional)</label><input id="aName" type="text" placeholder="Rider name" autocomplete="off">
+<label for="aPass">Password</label><input id="aPass" type="text" placeholder="Password" autocomplete="off">
+<button class="go" type="button" id="aGen" style="margin-top:12px">Line banan</button>
+<textarea id="aOut" readonly placeholder="Ekhane line ashbe"></textarea>
+</div>
+</div>
+</div>
+<div class="wrap">
+<section id="v-home">
+<header><div class="logo"><b>pathao</b><span>courier</span></div><div class="title"><h1>Rider <em>Panel</em></h1><p>Narsingdi-Shibpur Hub</p></div></header>
+<div class="home">
+<div class="who"><span id="whoTxt"></span><button id="logout" type="button">Logout</button></div>
+<div class="today" id="today"></div>
+<div class="big3">
+<button data-v="ret" style="--b:#e11d2e"><i>📦</i>Return Parcel</button>
+<button data-v="qr" style="--b:#1fa855"><i>💬</i>QR to WhatsApp</button>
+<button data-v="weekend" style="--b:#1a73d9"><i>📅</i>Weekend List</button>
+</div>
+<div class="log"><div class="lh"><h2>Weekend exchange</h2><button id="logClear">Clear</button></div><div id="logList"></div></div>
+</div>
+</section>
+<section class="view frm" id="v-ret" hidden><iframe title="Return Parcel" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;bn&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, viewport-fit=cover&quot;&gt;
+&lt;title&gt;Return Parcel&lt;/title&gt;
+&lt;script&gt;try{if(/; wv\)/.test(navigator.userAgent))document.documentElement.classList.add(&quot;wv&quot;)}catch(e){}&lt;/script&gt;
+&lt;script&gt;try{if(localStorage.getItem(&quot;theme&quot;)===&quot;dark&quot;)document.documentElement.classList.add(&quot;dark&quot;)}catch(e){}&lt;/script&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--bg:#F4F5F7;--card:#fff;--ink:#111827;--mute:#4B5563;--line:#E5E7EB;--soft:#F3F4F6;--acc:#C8102E;--hi:#FEF2F2}
+html.dark{--bg:#0B1220;--card:#162033;--ink:#E5E7EB;--mute:#9CA3AF;--line:#26324A;--soft:#1E293B;--acc:#0F766E;--hi:#134E4A}
+html.wv{--sat:max(env(safe-area-inset-top,0px),30px)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:&#x27;Hind Siliguri&#x27;,sans-serif}
+body{background:var(--bg);color:var(--ink);display:flex;justify-content:center}
+.app{width:100%;max-width:480px;min-height:100vh;padding-bottom:var(--sab);display:flex;flex-direction:column}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:calc(16px + var(--sat)) 16px 16px;display:flex;align-items:center;gap:12px}
+header.admin{background:#111827;color:#fff}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center}
+.ttl{flex:1}.ttl b{font-size:18px;display:block;line-height:1.2}.ttl span{font-size:13px;color:var(--mute);display:flex;align-items:center;gap:6px}
+header.admin .ttl span{color:#D1D5DB}.dot{width:8px;height:8px;border-radius:50%;background:#4ADE80}
+.ib{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--mute);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ib.txt{width:auto;padding:0 12px;font-size:13px;font-weight:700;white-space:nowrap}
+header.admin .ib{background:transparent;border-color:#4B5563;color:#fff}
+svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sw{padding:16px}.sw label{display:block;font-size:13px;font-weight:600;color:var(--mute);margin-bottom:8px}
+.iw{position:relative}.iw .ic{position:absolute;left:14px;top:16px;color:var(--mute)}
+input{width:100%;height:52px;padding:0 14px 0 44px;border:2px solid var(--line);border-radius:12px;font-size:16px;background:var(--card);color:var(--ink);outline:none}
+input:focus{border-color:var(--acc)}
+.sug{position:absolute;top:58px;left:0;right:0;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);overflow:hidden;z-index:50;display:none}
+.sug div{height:48px;padding:0 16px;display:flex;align-items:center;font-size:15px;border-bottom:1px solid var(--soft);cursor:pointer}
+.sug div:hover,.sug div.on{background:var(--hi)}
+.sug small{display:block;padding:8px 16px;font-size:12px;color:var(--mute);background:var(--soft)}
+.go{margin-top:12px;width:100%;height:52px;border:none;border-radius:12px;background:var(--acc);color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+#out{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mute)}.bar b{font-size:15px;color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r+.r{border-top:1px solid var(--soft);margin-top:10px;padding-top:10px}
+.cn{font-size:15px;font-weight:600}.id{font-family:monospace;background:var(--soft);padding:3px 7px;border-radius:6px;font-size:13px}
+.badge{font-size:12px;font-weight:600;background:#FEF3C7;color:#92400E;padding:3px 10px;border-radius:999px}
+.btn{height:44px;padding:0 16px;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.g{background:#15803D}.b{background:#0B5CAD}.wa{background:#128C4A}
+.tag{height:44px;padding:0 14px;border-radius:10px;background:#DCFCE7;color:#166534;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.msg{text-align:center;padding:40px 10px;color:var(--mute);background:var(--card);border:1px solid var(--line);border-radius:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}.stat i{font-style:normal;display:block;font-size:12px;color:var(--mute)}.stat b{font-size:24px}
+.tabs{display:flex;background:var(--line);border-radius:12px;padding:4px;gap:4px}
+.tabs button{flex:1;height:44px;border:none;border-radius:9px;background:transparent;color:var(--mute);font-size:14px;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.gh{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px}.gh b{font-size:15px}.gh span{font-size:12px;color:var(--mute);margin-left:6px}
+.sm{height:36px;padding:0 12px;border:1px solid #128C4A;border-radius:8px;background:transparent;color:#128C4A;font-size:13px;font-weight:600;cursor:pointer}
+.row{display:flex;align-items:center;gap:8px;padding:12px 0;border-top:1px solid var(--soft)}.row .m{flex:1}
+.rm{width:44px;height:44px;border:1px solid #FECACA;border-radius:10px;background:transparent;color:#DC2626;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.dz{margin-top:8px;border:1px dashed #FCA5A5;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--mute)}
+.dz button{height:40px;padding:0 12px;border:1px solid #DC2626;border-radius:10px;background:transparent;color:#DC2626;font-size:13px;font-weight:600;cursor:pointer}
+.sl{font-size:13px;font-weight:600;color:var(--mute);text-align:left;margin:14px 0 8px}
+#setM{align-items:flex-end;background:rgba(15,23,42,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:0}
+.sheet{background:var(--card);width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:10px 20px 24px;box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@media(min-width:520px){#setM{align-items:center;padding:16px}.sheet{border-radius:24px;max-width:380px}}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+.sh{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.sh .gi{width:40px;height:40px;border-radius:12px;background:var(--hi);color:var(--acc);display:flex;align-items:center;justify-content:center}
+.sh h3{flex:1;font-size:18px;text-align:left;margin:0}
+.x{width:36px;height:36px;border-radius:50%;border:none;background:var(--soft);color:var(--mute);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.opt{background:var(--soft);border-radius:16px;padding:14px;margin-bottom:12px}
+.opt .ot{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:12px;color:var(--ink)}
+.opt .ot svg{color:var(--acc)}
+.seg2{position:relative;display:flex;background:var(--line);border-radius:12px;padding:4px}
+.seg2 .th{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--card);border-radius:9px;box-shadow:0 1px 4px rgba(0,0,0,.15);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.seg2[data-pos=&quot;1&quot;] .th{transform:translateX(100%)}
+.seg2 button{position:relative;flex:1;height:42px;border:none;background:transparent;color:var(--mute);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:color .2s}
+.seg2 button.on{color:var(--ink)}
+/* Loading: top progress bar + skeleton cards + button spinner */
+#pb{position:fixed;top:0;left:0;right:0;height:3px;z-index:3000;overflow:hidden;opacity:0;transition:opacity .2s;pointer-events:none}
+#pb.on{opacity:1}
+#pb::before{content:&quot;&quot;;position:absolute;top:0;bottom:0;width:40%;background:var(--acc);border-radius:3px;animation:pbm 1s ease-in-out infinite}
+@keyframes pbm{0%{left:-40%}100%{left:100%}}
+.skc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;animation:fin .25s ease both}
+.skc .l{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.skb{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--soft) 25%,var(--line) 50%,var(--soft) 75%);background-size:300% 100%;animation:shm 1.4s ease-in-out infinite}
+.skb.w1{width:48%}.skb.w2{width:22%;height:20px;border-radius:999px}.skb.w3{width:36%}.skb.w4{width:28%;height:36px;border-radius:10px}
+@keyframes shm{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@keyframes fin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.go{position:relative}
+.go.ld{pointer-events:none;opacity:.85}
+.go.ld::after{content:&quot;&quot;;display:inline-block;width:16px;height:16px;margin-left:10px;vertical-align:-3px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spn .7s linear infinite}
+@keyframes spn{to{transform:rotate(360deg)}}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}.ov.on{display:flex}
+.md{background:var(--card);border-radius:20px;padding:24px 20px;width:100%;max-width:360px;text-align:center}.md h3{margin-bottom:6px}.md p{font-size:13px;color:var(--mute);margin-bottom:14px}
+.md input{padding-left:14px;text-align:center}.acts{display:flex;gap:10px;margin-top:16px}.acts button{flex:1;height:44px;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer}
+.no{background:var(--soft);color:var(--ink)}.yes{background:#0B5CAD;color:#fff}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;display:none;z-index:2000}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;pb&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;app&quot;&gt;
+  &lt;header id=&quot;hd&quot;&gt;
+    &lt;div class=&quot;logo&quot;&gt;&lt;svg width=&quot;22&quot; height=&quot;22&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M21 8l-9-5-9 5 9 5 9-5z&quot;/&gt;&lt;path d=&quot;M3 8v8l9 5 9-5V8&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;
+    &lt;div class=&quot;ttl&quot;&gt;&lt;b id=&quot;t1&quot;&gt;Return Parcel&lt;/b&gt;&lt;span id=&quot;t2&quot;&gt;রিটার্ন পার্সেল জমা দিন&lt;/span&gt;&lt;/div&gt;
+    &lt;button class=&quot;ib txt&quot; data-a=&quot;back&quot; id=&quot;backBtn&quot; style=&quot;display:none&quot;&gt;&lt;/button&gt;
+    &lt;button class=&quot;ib&quot; data-a=&quot;admin&quot; id=&quot;adminBtn&quot; aria-label=&quot;Incharge&quot;&gt;&lt;svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6l8-3z&quot;/&gt;&lt;path d=&quot;M9 12l2 2 4-4&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;
+    &lt;button class=&quot;ib&quot; data-a=&quot;settings&quot; aria-label=&quot;Settings&quot;&gt;&lt;svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;3&quot;/&gt;&lt;path d=&quot;M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;sw&quot; id=&quot;sw&quot;&gt;
+    &lt;label for=&quot;agentInput&quot; data-i18n=&quot;agentLbl&quot;&gt;&lt;/label&gt;
+    &lt;div class=&quot;iw&quot;&gt;
+      &lt;span class=&quot;ic&quot;&gt;&lt;svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;11&quot; cy=&quot;11&quot; r=&quot;7&quot;/&gt;&lt;path d=&quot;M21 21l-4.3-4.3&quot;/&gt;&lt;/svg&gt;&lt;/span&gt;
+      &lt;input id=&quot;agentInput&quot; type=&quot;text&quot; data-ph=&quot;agentPh&quot; autocomplete=&quot;off&quot;&gt;
+      &lt;div class=&quot;sug&quot; id=&quot;sug&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;button class=&quot;go&quot; id=&quot;goBtn&quot; data-a=&quot;search&quot; data-i18n=&quot;search&quot;&gt;&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div id=&quot;out&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;ov&quot; id=&quot;pinM&quot;&gt;&lt;div class=&quot;md&quot;&gt;
+  &lt;h3 data-i18n=&quot;pinTitle&quot;&gt;&lt;/h3&gt;&lt;p data-i18n=&quot;pinSub&quot;&gt;&lt;/p&gt;
+  &lt;input type=&quot;password&quot; id=&quot;pinIn&quot; maxlength=&quot;6&quot; placeholder=&quot;PIN&quot;&gt;
+  &lt;div id=&quot;pinErr&quot; style=&quot;color:#DC2626;font-size:12px;margin-top:6px;display:none&quot; data-i18n=&quot;pinErr&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;acts&quot;&gt;&lt;button class=&quot;no&quot; data-a=&quot;pinX&quot; data-i18n=&quot;cancel&quot;&gt;&lt;/button&gt;&lt;button class=&quot;yes&quot; data-a=&quot;pinOk&quot; data-i18n=&quot;enter&quot;&gt;&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;ov&quot; id=&quot;cfM&quot;&gt;&lt;div class=&quot;md&quot;&gt;
+  &lt;h3 id=&quot;cfT&quot;&gt;&lt;/h3&gt;&lt;p id=&quot;cfP&quot;&gt;&lt;/p&gt;
+  &lt;div class=&quot;acts&quot;&gt;&lt;button class=&quot;no&quot; data-a=&quot;cfX&quot; data-i18n=&quot;no&quot;&gt;&lt;/button&gt;&lt;button class=&quot;yes&quot; id=&quot;cfY&quot; data-a=&quot;cfOk&quot;&gt;&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;ov&quot; id=&quot;setM&quot;&gt;&lt;div class=&quot;sheet&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot;&gt;
+  &lt;div class=&quot;grab&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;sh&quot;&gt;&lt;div class=&quot;gi&quot;&gt;&lt;svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;3&quot;/&gt;&lt;path d=&quot;M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h3 data-i18n=&quot;settings&quot;&gt;&lt;/h3&gt;&lt;button class=&quot;x&quot; data-a=&quot;setX&quot; aria-label=&quot;Close&quot;&gt;&lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6L6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;
+  &lt;div class=&quot;opt&quot;&gt;&lt;div class=&quot;ot&quot;&gt;&lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18&quot;/&gt;&lt;/svg&gt;&lt;span data-i18n=&quot;language&quot;&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;seg2&quot; id=&quot;segL&quot; data-pos=&quot;0&quot;&gt;&lt;div class=&quot;th&quot;&gt;&lt;/div&gt;&lt;button data-a=&quot;setLang&quot; data-v=&quot;bn&quot;&gt;বাংলা&lt;/button&gt;&lt;button data-a=&quot;setLang&quot; data-v=&quot;en&quot;&gt;English&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;opt&quot;&gt;&lt;div class=&quot;ot&quot;&gt;&lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;4&quot;/&gt;&lt;path d=&quot;M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4&quot;/&gt;&lt;/svg&gt;&lt;span data-i18n=&quot;theme&quot;&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;seg2&quot; id=&quot;segT&quot; data-pos=&quot;0&quot;&gt;&lt;div class=&quot;th&quot;&gt;&lt;/div&gt;&lt;button data-a=&quot;setTheme&quot; data-v=&quot;light&quot;&gt;&lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;4&quot;/&gt;&lt;path d=&quot;M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4&quot;/&gt;&lt;/svg&gt;&lt;span data-i18n=&quot;day&quot;&gt;&lt;/span&gt;&lt;/button&gt;&lt;button data-a=&quot;setTheme&quot; data-v=&quot;dark&quot;&gt;&lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z&quot;/&gt;&lt;/svg&gt;&lt;span data-i18n=&quot;night&quot;&gt;&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;
+&lt;div id=&quot;toast&quot;&gt;&lt;/div&gt;
+
+&lt;script&gt;
+var API_URL = &quot;https://script.google.com/macros/s/AKfycbyjsJBewDIkuMIH6Ak6B7AzHQDCSdzs4cdeEsKFCbOCio6ANnfOp7jKCTyXTmtrRWmH/exec&quot;;
+var ADMIN_FNS = [&quot;getAllReturnParcels&quot;,&quot;toggleParcelStatusIncharge&quot;,&quot;removeDepositedParcel&quot;,&quot;clearAllDepositedLogs&quot;];
+var REFRESH_MS = 5000, MAX_SUG = 8;
+window.__adminPin = &quot;&quot;;
+
+// google.script.run এর বিকল্প (Apps Script Web App API)
+(function(){
+  function runner(onOk,onFail){
+    return new Proxy({},{get:function(_,name){
+      if(name===&quot;withSuccessHandler&quot;) return function(f){return runner(f,onFail)};
+      if(name===&quot;withFailureHandler&quot;) return function(f){return runner(onOk,f)};
+      return function(){
+        var args=[].slice.call(arguments);
+        if(ADMIN_FNS.indexOf(name)!==-1) args.push(window.__adminPin);
+        fetch(API_URL,{method:&quot;POST&quot;,headers:{&quot;Content-Type&quot;:&quot;text/plain;charset=utf-8&quot;},body:JSON.stringify({fn:name,args:args})})
+          .then(function(r){return r.json()})
+          .then(function(res){if(!res.ok) throw new Error(res.error||&quot;Unknown error&quot;); if(onOk) onOk(res.data)})
+          .catch(function(e){console.error(name,e); if(onFail) onFail(e)});
+      };
+    }});
+  }
+  window.google={script:{run:runner(null,null)}};
+})();
+
+var S = {agents:[], results:[], incharge:[], tab:&#x27;pending&#x27;, mode:&#x27;agent&#x27;, query:&#x27;&#x27;, busy:false, saves:0, sig:&#x27;&#x27;, pending:null, sugT:null, cache:{}, idx:[], lang:(function(){try{return localStorage.getItem(&quot;lang&quot;)||&quot;bn&quot;}catch(e){return &quot;bn&quot;}})()};
+var $ = function(id){return document.getElementById(id)};
+var esc = function(s){return String(s==null?&#x27;&#x27;:s).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,function(c){return {&#x27;&amp;&#x27;:&#x27;&amp;amp;&#x27;,&#x27;&lt;&#x27;:&#x27;&amp;lt;&#x27;,&#x27;&gt;&#x27;:&#x27;&amp;gt;&#x27;,&#x27;&quot;&#x27;:&#x27;&amp;quot;&#x27;,&quot;&#x27;&quot;:&#x27;&amp;#39;&#x27;}[c]})};
+var CHECK=&#x27;&lt;svg width=&quot;16&quot; height=&quot;16&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M5 12l5 5 9-10&quot;/&gt;&lt;/svg&gt;&#x27;;
+var TRASH=&#x27;&lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3&quot;/&gt;&lt;/svg&gt;&#x27;;
+
+var L={
+bn:{sub:&#x27;রিটার্ন পার্সেল জমা দিন&#x27;,agentLbl:&#x27;এজেন্টের নাম&#x27;,agentPh:&#x27;Agent Name লিখুন&#x27;,search:&#x27;Search&#x27;,empty:&#x27;এজেন্টের নাম লিখে সার্চ করুন&#x27;,pinTitle:&#x27;ইনচার্জ এক্সেস&#x27;,pinSub:&#x27;PIN দিন&#x27;,pinErr:&#x27;ভুল PIN! আবার চেষ্টা করুন।&#x27;,cancel:&#x27;বাতিল&#x27;,enter:&#x27;প্রবেশ করুন&#x27;,no:&#x27;না&#x27;,agentPanel:&#x27;← এজেন্ট প্যানেল&#x27;,live:&#x27;Live · প্রতি ৫ সেকেন্ডে আপডেট&#x27;,loading:&#x27;লোডিং হচ্ছে...&#x27;,needName:&#x27;Agent-এর নাম লিখুন&#x27;,err:&#x27;ত্রুটি হয়েছে: &#x27;,none:&#x27;এই এজেন্টের কোনো তথ্য পাওয়া যায়নি!&#x27;,total:function(n){return &#x27;মোট &#x27;+n+&#x27;টি পার্সেল&#x27;},dep:&#x27;জমা দিন&#x27;,done:&#x27;জমা হয়েছে&#x27;,wa:function(n){return &#x27;WhatsApp-এ পাঠান (&#x27;+n+&#x27;টি জমা)&#x27;},fail:&#x27;সেভ হয়নি! নেট চেক করে আবার চেষ্টা করুন&#x27;,fail2:&#x27;সেভ হয়নি! আবার চেষ্টা করুন&#x27;,more:&#x27;আরও নির্দিষ্ট করে লিখুন&#x27;,sTot:&#x27;মোট রিটার্ন&#x27;,sDep:&#x27;জমা হয়েছে&#x27;,sPen:&#x27;পেন্ডিং&#x27;,tPen:function(n){return &#x27;পেন্ডিং (&#x27;+n+&#x27;)&#x27;},tDep:function(n){return &#x27;জমা সম্পন্ন (&#x27;+n+&#x27;)&#x27;},remAll:&#x27;সবাইকে একসাথে Reminder পাঠান&#x27;,rem:&#x27;Reminder&#x27;,noItems:&#x27;কোনো তথ্য পাওয়া যায়নি!&#x27;,cPen:function(n){return n+&#x27; টি পেন্ডিং&#x27;},cDep:function(n){return n+&#x27; টি জমা&#x27;},mark:&#x27;Mark Deposited&#x27;,undo:&#x27;Undo&#x27;,dz:&#x27;Danger zone&lt;br&gt;Deposited_Logs-এর সব ডেটা মুছে যাবে&#x27;,clr:&#x27;লগ ক্লিয়ার&#x27;,ovrT:&#x27;ডিপোজিট মার্ক&#x27;,undoT:&#x27;আন-ডিপোজিট (Undo)&#x27;,ovrP:function(id,v){return &#x27;পার্সেল (&#x27;+id+&#x27;) &quot;&#x27;+v+&#x27;&quot; করতে চান?&#x27;},ovrY:&#x27;হ্যাঁ, পরিবর্তন করুন&#x27;,delT:&#x27;পার্সেল রিমুভ&#x27;,delP:function(id){return &#x27;(&#x27;+id+&#x27;) পার্সেলটি Deposited_Logs থেকে মুছে ফেলতে চান?&#x27;},delY:&#x27;হ্যাঁ, মুছে ফেলুন&#x27;,clrT:&#x27;সমস্ত লগ ক্লিয়ার&#x27;,clrP:&#x27;Deposited_Logs শীটের সকল ডেটা মুছে ফেলতে চান?&#x27;,clrY:&#x27;হ্যাঁ, সব ডিলিট করুন&#x27;,loadFail:&#x27;লোড করা যায়নি&#x27;,settings:&#x27;সেটিংস&#x27;,language:&#x27;ভাষা&#x27;,theme:&#x27;থিম&#x27;,day:&#x27;দিন&#x27;,night:&#x27;রাত&#x27;,close:&#x27;বন্ধ করুন&#x27;,
+waMsg:function(a,l){var s=&quot;📦 *Return Parcel Deposit Alert*\n\n👤 *Agent Name:* &quot;+a+&quot;\n📊 *Total Parcels:* &quot;+l.length+&quot; টি\n\n📋 *Parcel Details:*\n&quot;;l.forEach(function(i,k){s+=(k+1)+&quot;. &quot;+i.customerName+&quot; (&quot;+i.consignmentId+&quot;)\n&quot;});return s},
+remMsg:function(a,l){var s=&quot;⚠️ *Return Parcel Deposit Reminder*\n\nপ্রিয় *&quot;+a+&quot;*,\nআপনার নিচের &quot;+l.length+&quot; টি পার্সেল এখনো জমা হয়নি। অনুগ্রহ করে দ্রুত জমা দিন:\n\n&quot;;l.forEach(function(i,k){s+=(k+1)+&quot;. &quot;+i.customerName+&quot; (&quot;+i.consignmentId+&quot;)\n&quot;});return s+&quot;\nধন্যবাদ!&quot;},
+remAllMsg:function(g,n){var s=&quot;⚠️ *Return Parcel Deposit Reminder*\n\nপ্রিয় এজেন্টবৃন্দ, নিচের পার্সেলগুলো এখনো জমা হয়নি। অনুগ্রহ করে দ্রুত জমা দিন:\n\n&quot;,c=1;Object.keys(g).forEach(function(a){s+=c+&quot;. *&quot;+a+&quot;* (&quot;+g[a].length+&quot; টি বাকি):\n&quot;;g[a].forEach(function(x){s+=&quot;   • &quot;+x+&quot;\n&quot;});s+=&quot;\n&quot;;c++});return s+&quot;📌 *মোট পেন্ডিং:* &quot;+n+&quot; টি।\nধন্যবাদ!&quot;}},
+en:{sub:&#x27;Deposit return parcels&#x27;,agentLbl:&#x27;Agent name&#x27;,agentPh:&#x27;Type agent name&#x27;,search:&#x27;Search&#x27;,empty:&#x27;Search by agent name&#x27;,pinTitle:&#x27;Incharge access&#x27;,pinSub:&#x27;Enter PIN&#x27;,pinErr:&#x27;Wrong PIN. Try again.&#x27;,cancel:&#x27;Cancel&#x27;,enter:&#x27;Enter&#x27;,no:&#x27;No&#x27;,agentPanel:&#x27;← Agent Panel&#x27;,live:&#x27;Live · updates every 5s&#x27;,loading:&#x27;Loading...&#x27;,needName:&#x27;Enter an agent name&#x27;,err:&#x27;Error: &#x27;,none:&#x27;No data found for this agent.&#x27;,total:function(n){return n+&#x27; parcels&#x27;},dep:&#x27;Deposit&#x27;,done:&#x27;Deposited&#x27;,wa:function(n){return &#x27;Send to WhatsApp (&#x27;+n+&#x27; deposited)&#x27;},fail:&#x27;Not saved! Check your connection and retry&#x27;,fail2:&#x27;Not saved! Please try again&#x27;,more:&#x27;Type more to narrow down&#x27;,sTot:&#x27;Total returns&#x27;,sDep:&#x27;Deposited&#x27;,sPen:&#x27;Pending&#x27;,tPen:function(n){return &#x27;Pending (&#x27;+n+&#x27;)&#x27;},tDep:function(n){return &#x27;Deposited (&#x27;+n+&#x27;)&#x27;},remAll:&#x27;Send reminder to everyone&#x27;,rem:&#x27;Reminder&#x27;,noItems:&#x27;Nothing found.&#x27;,cPen:function(n){return n+&#x27; pending&#x27;},cDep:function(n){return n+&#x27; deposited&#x27;},mark:&#x27;Mark Deposited&#x27;,undo:&#x27;Undo&#x27;,dz:&#x27;Danger zone&lt;br&gt;All Deposited_Logs data will be deleted&#x27;,clr:&#x27;Clear logs&#x27;,ovrT:&#x27;Mark deposited&#x27;,undoT:&#x27;Undo deposit&#x27;,ovrP:function(id,v){return &#x27;Set parcel (&#x27;+id+&#x27;) to &quot;&#x27;+v+&#x27;&quot;?&#x27;},ovrY:&#x27;Yes, change&#x27;,delT:&#x27;Remove parcel&#x27;,delP:function(id){return &#x27;Remove parcel (&#x27;+id+&#x27;) from Deposited_Logs?&#x27;},delY:&#x27;Yes, remove&#x27;,clrT:&#x27;Clear all logs&#x27;,clrP:&#x27;Delete all data in the Deposited_Logs sheet?&#x27;,clrY:&#x27;Yes, delete all&#x27;,loadFail:&#x27;Could not load&#x27;,settings:&#x27;Settings&#x27;,language:&#x27;Language&#x27;,theme:&#x27;Theme&#x27;,day:&#x27;Day&#x27;,night:&#x27;Night&#x27;,close:&#x27;Close&#x27;,
+waMsg:function(a,l){var s=&quot;📦 *Return Parcel Deposit Alert*\n\n👤 *Agent Name:* &quot;+a+&quot;\n📊 *Total Parcels:* &quot;+l.length+&quot;\n\n📋 *Parcel Details:*\n&quot;;l.forEach(function(i,k){s+=(k+1)+&quot;. &quot;+i.customerName+&quot; (&quot;+i.consignmentId+&quot;)\n&quot;});return s},
+remMsg:function(a,l){var s=&quot;⚠️ *Return Parcel Deposit Reminder*\n\nDear *&quot;+a+&quot;*,\nThe following &quot;+l.length+&quot; parcels have not been deposited yet. Please deposit them as soon as possible:\n\n&quot;;l.forEach(function(i,k){s+=(k+1)+&quot;. &quot;+i.customerName+&quot; (&quot;+i.consignmentId+&quot;)\n&quot;});return s+&quot;\nThank you!&quot;},
+remAllMsg:function(g,n){var s=&quot;⚠️ *Return Parcel Deposit Reminder*\n\nDear agents, the following parcels have not been deposited yet. Please deposit them as soon as possible:\n\n&quot;,c=1;Object.keys(g).forEach(function(a){s+=c+&quot;. *&quot;+a+&quot;* (&quot;+g[a].length+&quot; remaining):\n&quot;;g[a].forEach(function(x){s+=&quot;   • &quot;+x+&quot;\n&quot;});s+=&quot;\n&quot;;c++});return s+&quot;📌 *Total pending:* &quot;+n+&quot;\nThank you!&quot;}}
+};
+function t(k,a,b){var v=L[S.lang][k];return typeof v===&#x27;function&#x27;?v(a,b):v}
+function applyLang(){
+  document.documentElement.lang=S.lang;
+  [].forEach.call(document.querySelectorAll(&#x27;[data-i18n]&#x27;),function(e){e.textContent=t(e.dataset.i18n)});
+  [].forEach.call(document.querySelectorAll(&#x27;[data-ph]&#x27;),function(e){e.placeholder=t(e.dataset.ph)});
+  $(&#x27;backBtn&#x27;).textContent=t(&#x27;agentPanel&#x27;);syncSet();
+  var a=S.mode===&#x27;admin&#x27;;$(&#x27;t1&#x27;).textContent=a?&#x27;Incharge Panel&#x27;:&#x27;Return Parcel&#x27;;
+  $(&#x27;t2&#x27;).innerHTML=a?&#x27;&lt;i class=&quot;dot&quot;&gt;&lt;/i&gt;&#x27;+t(&#x27;live&#x27;):t(&#x27;sub&#x27;);
+}
+function rerender(){
+  if(S.mode===&#x27;admin&#x27;){if(S.sig)renderIncharge();else msg(t(&#x27;loading&#x27;))}
+  else if(S.query&amp;&amp;S.sig)showResults(S.results);
+  else if(!S.query)msg(t(&#x27;empty&#x27;));
+}
+function setLang(l){S.lang=l;try{localStorage.setItem(&#x27;lang&#x27;,l)}catch(e){}applyLang();rerender()}
+var SUN=&#x27;&lt;svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;4&quot;/&gt;&lt;path d=&quot;M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4&quot;/&gt;&lt;/svg&gt;&#x27;;
+var MOON=&#x27;&lt;svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z&quot;/&gt;&lt;/svg&gt;&#x27;;
+function syncSet(){
+  var dk=document.documentElement.classList.contains(&#x27;dark&#x27;);
+  [].forEach.call(document.querySelectorAll(&#x27;[data-a=&quot;setLang&quot;]&#x27;),function(b){b.classList.toggle(&#x27;on&#x27;,b.dataset.v===S.lang)});
+  [].forEach.call(document.querySelectorAll(&#x27;[data-a=&quot;setTheme&quot;]&#x27;),function(b){b.classList.toggle(&#x27;on&#x27;,(b.dataset.v===&#x27;dark&#x27;)===dk)});
+  $(&#x27;segL&#x27;).dataset.pos=S.lang===&#x27;en&#x27;?1:0; $(&#x27;segT&#x27;).dataset.pos=dk?1:0;
+}
+function setTheme(d){document.documentElement.classList.toggle(&#x27;dark&#x27;,d);try{localStorage.setItem(&#x27;theme&#x27;,d?&#x27;dark&#x27;:&#x27;light&#x27;)}catch(e){}syncSet()}
+// WhatsApp: একবার পাঠানো পার্সেলে আর বাটন দেখাবে না (এই ডিভাইসে মনে রাখে)
+var WA=[];try{WA=JSON.parse(localStorage.getItem(&#x27;wa_sent&#x27;)||&#x27;[]&#x27;)}catch(e){}
+function waSent(id){return WA.indexOf(id)!==-1}
+function waSave(){try{localStorage.setItem(&#x27;wa_sent&#x27;,JSON.stringify(WA.slice(-3000)))}catch(e){}}
+function waMark(ids){ids.forEach(function(i){if(!waSent(i))WA.push(i)});waSave()}
+function waUnmark(id){var k=WA.indexOf(id);if(k!==-1){WA.splice(k,1);waSave()}}
+
+function toast(t){var e=$(&#x27;toast&#x27;);e.textContent=t;e.style.display=&#x27;block&#x27;;clearTimeout(toast.t);toast.t=setTimeout(function(){e.style.display=&#x27;none&#x27;},3000)}
+function isDep(i){return i.isDepositedInSheet}
+function msg(t){$(&#x27;out&#x27;).innerHTML=&#x27;&lt;div class=&quot;msg&quot;&gt;&#x27;+t+&#x27;&lt;/div&gt;&#x27;}
+
+// ---------- Agent list: cache (1 ঘণ্টা) + পরিষ্কার সার্চ ইনডেক্স ----------
+function buildIdx(){S.idx=S.agents.map(function(n){var x=String(n==null?&#x27;&#x27;:n);return {n:x,l:x.toLowerCase()}}).filter(function(x){return x.n})}
+function loadAgents(){
+  try{S.agents=JSON.parse(localStorage.getItem(&#x27;agents_cache&#x27;)||&#x27;[]&#x27;)}catch(e){}
+  buildIdx();
+  // সবসময় ব্যাকগ্রাউন্ডে রিফ্রেশ করি — এতে সার্ভারও আগে থেকে &quot;warm&quot; হয়ে যায় (প্রথম সার্চ ধীর হয় না)
+  google.script.run.withSuccessHandler(function(n){
+    S.agents=n||[];buildIdx();
+    try{localStorage.setItem(&#x27;agents_cache&#x27;,JSON.stringify(S.agents));localStorage.setItem(&#x27;agents_ts&#x27;,String(Date.now()))}catch(e){}
+  }).getAllAgentNames();
+}
+
+// ---------- Suggestions: debounce + max 8 ----------
+$(&#x27;agentInput&#x27;).addEventListener(&#x27;input&#x27;,function(){clearTimeout(S.sugT);S.sugT=setTimeout(showSug,60)});
+$(&#x27;agentInput&#x27;).addEventListener(&#x27;keydown&#x27;,function(e){if(e.key===&#x27;Enter&#x27;){$(&#x27;sug&#x27;).style.display=&#x27;none&#x27;;search()}});
+function showSug(){
+  var v=$(&#x27;agentInput&#x27;).value.trim().toLowerCase(), box=$(&#x27;sug&#x27;);
+  if(!v){box.style.display=&#x27;none&#x27;;return}
+  var st=[],ct=[],i,x,p;
+  for(i=0;i&lt;S.idx.length&amp;&amp;st.length&lt;MAX_SUG;i++){x=S.idx[i];p=x.l.indexOf(v);if(p===0)st.push(x.n);else if(p&gt;0&amp;&amp;ct.length&lt;MAX_SUG)ct.push(x.n)}
+  var all=st.concat(ct), more=all.length&gt;MAX_SUG||(st.length&gt;=MAX_SUG&amp;&amp;i&lt;S.idx.length);
+  var m=all.slice(0,MAX_SUG);
+  if(!m.length){box.style.display=&#x27;none&#x27;;return}
+  if(m.length===1) prefetch(m[0]);
+  var html=m.map(function(n){return &#x27;&lt;div data-a=&quot;pick&quot; data-v=&quot;&#x27;+esc(n)+&#x27;&quot;&gt;&#x27;+esc(n)+&#x27;&lt;/div&gt;&#x27;}).join(&#x27;&#x27;)+(more?&#x27;&lt;small&gt;&#x27;+t(&#x27;more&#x27;)+&#x27;&lt;/small&gt;&#x27;:&#x27;&#x27;);
+  if(box.dataset.k!==html){box.innerHTML=html;box.dataset.k=html}
+  box.style.display=&#x27;block&#x27;;
+}
+
+// ---------- Loading UI ----------
+function loadOn(){$(&#x27;pb&#x27;).classList.add(&#x27;on&#x27;);$(&#x27;goBtn&#x27;).classList.add(&#x27;ld&#x27;)}
+function loadOff(){$(&#x27;pb&#x27;).classList.remove(&#x27;on&#x27;);$(&#x27;goBtn&#x27;).classList.remove(&#x27;ld&#x27;)}
+function skeleton(){
+  var c=&#x27;&lt;div class=&quot;skc&quot;&gt;&lt;div class=&quot;l&quot;&gt;&lt;div class=&quot;skb w1&quot;&gt;&lt;/div&gt;&lt;div class=&quot;skb w2&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;l&quot;&gt;&lt;div class=&quot;skb w3&quot;&gt;&lt;/div&gt;&lt;div class=&quot;skb w4&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&#x27;;
+  return &#x27;&lt;div class=&quot;bar&quot; style=&quot;margin-top:4px&quot;&gt;&lt;div class=&quot;skb w1&quot;&gt;&lt;/div&gt;&lt;div class=&quot;skb w3&quot; style=&quot;width:25%&quot;&gt;&lt;/div&gt;&lt;/div&gt;&#x27;+c+c+c;
+}
+
+// ---------- Result cache (localStorage-এ সেভ — অ্যাপ আবার খুললেও সাথে সাথে দেখায়) ----------
+var RC={};try{RC=JSON.parse(localStorage.getItem(&#x27;res_cache&#x27;)||&#x27;{}&#x27;)}catch(e){}
+function rcSave(k,d){
+  RC[k]={t:Date.now(),d:d};
+  var ks=Object.keys(RC);
+  if(ks.length&gt;40){ks.sort(function(a,b){return RC[a].t-RC[b].t}).slice(0,ks.length-40).forEach(function(x){delete RC[x]})}
+  try{localStorage.setItem(&#x27;res_cache&#x27;,JSON.stringify(RC))}catch(e){}
+}
+function rcGet(k){return S.cache[k]||(RC[k]&amp;&amp;RC[k].d)||null}
+
+// ---------- Prefetch: সাজেশনে একটাই মিল বা hover/touch করলেই আগে থেকে ডেটা আনি ----------
+var PF={};
+function prefetch(n){
+  var k=String(n||&#x27;&#x27;).trim().toLowerCase();
+  if(!k||PF[k]||S.cache[k]) return;
+  PF[k]=1;
+  google.script.run.withSuccessHandler(function(d){
+    delete PF[k]; d=d||[]; S.cache[k]=d; rcSave(k,d);
+    // ইউজার এর মধ্যে সার্চ করে ফেললে লোডিং থেকে সাথে সাথে রেজাল্ট দেখাই
+    if(S.mode===&#x27;agent&#x27;&amp;&amp;S.query.toLowerCase()===k&amp;&amp;!S.sig){S.sig=JSON.stringify(d);S.busy=false;loadOff();showResults(d)}
+  }).withFailureHandler(function(){delete PF[k]}).searchAgentData(n.trim());
+}
+$(&#x27;sug&#x27;).addEventListener(&#x27;pointerover&#x27;,function(e){var el=e.target.closest(&#x27;[data-a=&quot;pick&quot;]&#x27;);if(el)prefetch(el.dataset.v)});
+$(&#x27;sug&#x27;).addEventListener(&#x27;touchstart&#x27;,function(e){var el=e.target.closest(&#x27;[data-a=&quot;pick&quot;]&#x27;);if(el)prefetch(el.dataset.v)},{passive:true});
+
+// ---------- Agent search ----------
+function search(){
+  var n=$(&#x27;agentInput&#x27;).value.trim();
+  if(!n){toast(t(&#x27;needName&#x27;));return}
+  S.query=n;S.sig=&#x27;&#x27;;S.busy=false;
+  var k=n.toLowerCase(), c=rcGet(k);
+  if(c){S.sig=JSON.stringify(c);showResults(c);fetchData(true)}   // আগের রেজাল্ট সাথে সাথে, পেছনে আপডেট
+  else{$(&#x27;out&#x27;).innerHTML=skeleton();loadOn();fetchData(false)}
+}
+function fetchData(silent){
+  if(S.busy) return; S.busy=true;
+  var q=S.query;
+  google.script.run.withSuccessHandler(function(d){
+    S.busy=false; loadOff(); if(q!==S.query||S.mode!==&#x27;agent&#x27;) return;
+    d=d||[]; d.forEach(function(i){if(!isDep(i))waUnmark(i.consignmentId)});
+    S.cache[q.toLowerCase()]=d; rcSave(q.toLowerCase(),d);
+    var sig=JSON.stringify(d); if(silent&amp;&amp;sig===S.sig) return;
+    S.sig=sig; showResults(d);
+  }).withFailureHandler(function(e){
+    S.busy=false; loadOff(); if(!silent) msg(t(&#x27;err&#x27;)+esc(e.message));
+  }).searchAgentData(q);
+}
+function showResults(data){
+  S.results=data;
+  if(!data.length){msg(t(&#x27;none&#x27;));return}
+  var unsent=data.filter(function(i){return isDep(i)&amp;&amp;!waSent(i.consignmentId)}), h=&#x27;&#x27;;
+  h+=&#x27;&lt;div class=&quot;bar&quot; style=&quot;margin-top:4px&quot;&gt;&lt;b&gt;&#x27;+esc(data[0].agentName)+&#x27;&lt;/b&gt;&lt;span&gt;&#x27;+t(&#x27;total&#x27;,data.length)+&#x27;&lt;/span&gt;&lt;/div&gt;&#x27;;
+  data.forEach(function(i){
+    var act=isDep(i)?&#x27;&lt;span class=&quot;tag&quot;&gt;&#x27;+CHECK+t(&#x27;done&#x27;)+&#x27;&lt;/span&gt;&#x27;:(String(i.status||&#x27;&#x27;).replace(/\s+/g,&#x27; &#x27;).trim().toLowerCase()===&#x27;return&#x27;?&#x27;&lt;button class=&quot;btn g&quot; data-a=&quot;dep&quot; data-id=&quot;&#x27;+esc(i.consignmentId)+&#x27;&quot;&gt;&#x27;+t(&#x27;dep&#x27;)+&#x27;&lt;/button&gt;&#x27;:&#x27;&#x27;);
+    h+=&#x27;&lt;div class=&quot;card&quot;&gt;&lt;div class=&quot;r&quot;&gt;&lt;span class=&quot;cn&quot;&gt;&#x27;+esc(i.customerName)+&#x27;&lt;/span&gt;&lt;span class=&quot;badge&quot;&gt;&#x27;+esc(i.status)+&#x27;&lt;/span&gt;&lt;/div&gt;&#x27;+
+       &#x27;&lt;div class=&quot;r&quot;&gt;&lt;span style=&quot;font-size:13px;color:var(--mute)&quot;&gt;ID &lt;span class=&quot;id&quot;&gt;&#x27;+esc(i.consignmentId)+&#x27;&lt;/span&gt;&lt;/span&gt;&#x27;+act+&#x27;&lt;/div&gt;&lt;/div&gt;&#x27;;
+  });
+  if(unsent.length) h+=&#x27;&lt;button class=&quot;btn wa&quot; style=&quot;height:50px;font-size:15px;margin-top:6px&quot; data-a=&quot;wa&quot;&gt;&#x27;+t(&#x27;wa&#x27;,unsent.length)+&#x27;&lt;/button&gt;&#x27;;
+  $(&#x27;out&#x27;).innerHTML=h;
+}
+function deposit(id){
+  var it=S.results.find(function(x){return x.consignmentId===id}); if(!it) return;
+  it.isDepositedInSheet=true; S.saves++; showResults(S.results);
+  google.script.run.withSuccessHandler(function(){S.saves--})
+  .withFailureHandler(function(){S.saves--;it.isDepositedInSheet=false;showResults(S.results);toast(t(&#x27;fail&#x27;))})
+  .markBulkParcelsAsDeposited(it.agentName,[id]);
+}
+function whatsapp(){
+  var l=S.results.filter(function(i){return isDep(i)&amp;&amp;!waSent(i.consignmentId)}); if(!l.length) return;
+  var ids=l.map(function(i){return i.consignmentId});
+  google.script.run.markBulkParcelsAsDeposited(l[0].agentName,ids);
+  waMark(ids); showResults(S.results);
+  window.open(&#x27;https://api.whatsapp.com/send?text=&#x27;+encodeURIComponent(t(&#x27;waMsg&#x27;,l[0].agentName,l)),&#x27;_blank&#x27;);
+}
+
+// ---------- Incharge ----------
+function setMode(m){
+  S.mode=m; var a=m===&#x27;admin&#x27;;
+  $(&#x27;hd&#x27;).className=a?&#x27;admin&#x27;:&#x27;&#x27;; $(&#x27;sw&#x27;).style.display=a?&#x27;none&#x27;:&#x27;&#x27;;
+  $(&#x27;backBtn&#x27;).style.display=a?&#x27;&#x27;:&#x27;none&#x27;; $(&#x27;adminBtn&#x27;).style.display=a?&#x27;none&#x27;:&#x27;&#x27;;
+  S.sig=&#x27;&#x27;; applyLang();
+}
+function exitAdmin(){window.__adminPin=&#x27;&#x27;;S.incharge=[];S.results=[];S.sig=&#x27;&#x27;;S.query=&#x27;&#x27;;$(&#x27;agentInput&#x27;).value=&#x27;&#x27;;setMode(&#x27;agent&#x27;);msg(t(&#x27;empty&#x27;))}
+function submitPin(){
+  var p=$(&#x27;pinIn&#x27;).value.trim(); if(!p) return; $(&#x27;pinErr&#x27;).style.display=&#x27;none&#x27;;
+  google.script.run.withSuccessHandler(function(ok){
+    if(ok){window.__adminPin=p;$(&#x27;pinM&#x27;).classList.remove(&#x27;on&#x27;);setMode(&#x27;admin&#x27;);msg(t(&#x27;loading&#x27;));S.busy=false;fetchIncharge(false)}
+    else $(&#x27;pinErr&#x27;).style.display=&#x27;block&#x27;;
+  }).withFailureHandler(function(){$(&#x27;pinErr&#x27;).style.display=&#x27;block&#x27;}).verifyPin(p);
+}
+function fetchIncharge(silent){
+  if(S.busy) return; S.busy=true;
+  google.script.run.withSuccessHandler(function(d){
+    S.busy=false; if(S.mode!==&#x27;admin&#x27;) return;
+    var sig=JSON.stringify(d||[]); if(sig===S.sig) return;
+    S.sig=sig; S.incharge=d||[]; renderIncharge();
+  }).withFailureHandler(function(){S.busy=false;if(!silent)msg(t(&#x27;loadFail&#x27;))}).getAllReturnParcels();
+}
+function renderIncharge(){
+  var all=S.incharge, dep=all.filter(isDep).length, pen=all.length-dep, isP=S.tab===&#x27;pending&#x27;;
+  var list=all.filter(function(i){return isP?!isDep(i):isDep(i)});
+  var h=&#x27;&lt;div class=&quot;stats&quot; style=&quot;margin-top:4px&quot;&gt;&lt;div class=&quot;stat&quot;&gt;&lt;i&gt;&#x27;+t(&#x27;sTot&#x27;)+&#x27;&lt;/i&gt;&lt;b style=&quot;color:#0B5CAD&quot;&gt;&#x27;+all.length+&#x27;&lt;/b&gt;&lt;/div&gt;&lt;div class=&quot;stat&quot;&gt;&lt;i&gt;&#x27;+t(&#x27;sDep&#x27;)+&#x27;&lt;/i&gt;&lt;b style=&quot;color:#15803D&quot;&gt;&#x27;+dep+&#x27;&lt;/b&gt;&lt;/div&gt;&lt;div class=&quot;stat&quot;&gt;&lt;i&gt;&#x27;+t(&#x27;sPen&#x27;)+&#x27;&lt;/i&gt;&lt;b style=&quot;color:#DC2626&quot;&gt;&#x27;+pen+&#x27;&lt;/b&gt;&lt;/div&gt;&lt;/div&gt;&#x27;+
+   &#x27;&lt;div class=&quot;tabs&quot;&gt;&lt;button class=&quot;&#x27;+(isP?&#x27;on&#x27;:&#x27;&#x27;)+&#x27;&quot; data-a=&quot;tab&quot; data-v=&quot;pending&quot;&gt;&#x27;+t(&#x27;tPen&#x27;,pen)+&#x27;&lt;/button&gt;&lt;button class=&quot;&#x27;+(S.tab===&#x27;deposited&#x27;?&#x27;on&#x27;:&#x27;&#x27;)+&#x27;&quot; data-a=&quot;tab&quot; data-v=&quot;deposited&quot;&gt;&#x27;+t(&#x27;tDep&#x27;,dep)+&#x27;&lt;/button&gt;&lt;/div&gt;&#x27;;
+  if(isP&amp;&amp;list.length) h+=&#x27;&lt;button class=&quot;btn wa&quot; style=&quot;height:48px&quot; data-a=&quot;remAll&quot;&gt;&#x27;+t(&#x27;remAll&#x27;)+&#x27;&lt;/button&gt;&#x27;;
+  if(!list.length) h+=&#x27;&lt;div class=&quot;msg&quot;&gt;&#x27;+t(&#x27;noItems&#x27;)+&#x27;&lt;/div&gt;&#x27;;
+  var g={}; list.forEach(function(i){(g[i.agentName]=g[i.agentName]||[]).push(i)});
+  Object.keys(g).forEach(function(a){
+    h+=&#x27;&lt;div class=&quot;card&quot; style=&quot;padding:4px 14px 2px&quot;&gt;&lt;div class=&quot;gh&quot; style=&quot;padding-top:12px&quot;&gt;&lt;div&gt;&lt;b&gt;&#x27;+esc(a)+&#x27;&lt;/b&gt;&lt;span&gt;&#x27;+(isP?t(&#x27;cPen&#x27;,g[a].length):t(&#x27;cDep&#x27;,g[a].length))+&#x27;&lt;/span&gt;&lt;/div&gt;&#x27;+(isP?&#x27;&lt;button class=&quot;sm&quot; data-a=&quot;rem&quot; data-v=&quot;&#x27;+esc(a)+&#x27;&quot;&gt;&#x27;+t(&#x27;rem&#x27;)+&#x27;&lt;/button&gt;&#x27;:&#x27;&#x27;)+&#x27;&lt;/div&gt;&#x27;;
+    g[a].forEach(function(i){
+      var d=isDep(i);
+      h+=&#x27;&lt;div class=&quot;row&quot;&gt;&lt;div class=&quot;m&quot;&gt;&lt;div style=&quot;font-size:14px;font-weight:600&quot;&gt;&#x27;+esc(i.customerName)+&#x27;&lt;/div&gt;&lt;div style=&quot;font-size:12px;color:var(--mute);font-family:monospace;margin-top:2px&quot;&gt;&#x27;+esc(i.consignmentId)+&#x27;&lt;/div&gt;&lt;/div&gt;&#x27;+
+         &#x27;&lt;button class=&quot;btn &#x27;+(d?&#x27;&#x27;:&#x27;b&#x27;)+&#x27;&quot; style=&quot;&#x27;+(d?&#x27;background:#6B7280;&#x27;:&#x27;&#x27;)+&#x27;font-size:13px&quot; data-a=&quot;ovr&quot; data-ag=&quot;&#x27;+esc(a)+&#x27;&quot; data-id=&quot;&#x27;+esc(i.consignmentId)+&#x27;&quot; data-v=&quot;&#x27;+(d?&#x27;Pending&#x27;:&#x27;Deposited&#x27;)+&#x27;&quot;&gt;&#x27;+(d?t(&#x27;undo&#x27;):t(&#x27;mark&#x27;))+&#x27;&lt;/button&gt;&#x27;+
+         &#x27;&lt;button class=&quot;rm&quot; aria-label=&quot;Remove&quot; data-a=&quot;del&quot; data-id=&quot;&#x27;+esc(i.consignmentId)+&#x27;&quot;&gt;&#x27;+TRASH+&#x27;&lt;/button&gt;&lt;/div&gt;&#x27;;
+    });
+    h+=&#x27;&lt;/div&gt;&#x27;;
+  });
+  h+=&#x27;&lt;div class=&quot;dz&quot;&gt;&lt;div&gt;&#x27;+t(&#x27;dz&#x27;)+&#x27;&lt;/div&gt;&lt;button data-a=&quot;clr&quot;&gt;&#x27;+t(&#x27;clr&#x27;)+&#x27;&lt;/button&gt;&lt;/div&gt;&#x27;;
+  $(&#x27;out&#x27;).innerHTML=h;
+}
+
+// ---------- Confirm modal ----------
+function ask(p,title,text,label,color){
+  S.pending=p;$(&#x27;cfT&#x27;).textContent=title;$(&#x27;cfP&#x27;).textContent=text;
+  var y=$(&#x27;cfY&#x27;);y.textContent=label;y.style.background=color;$(&#x27;cfM&#x27;).classList.add(&#x27;on&#x27;);
+}
+function doConfirmed(){
+  var p=S.pending; S.pending=null; $(&#x27;cfM&#x27;).classList.remove(&#x27;on&#x27;); if(!p) return;
+  var sync=function(){S.saves--;S.sig=&#x27;&#x27;;S.busy=false;fetchIncharge(true)};
+  var fail=function(){S.saves--;S.sig=&#x27;&#x27;;toast(t(&#x27;fail2&#x27;));fetchIncharge(true)};
+  S.saves++;
+  if(p.t===&#x27;clr&#x27;) google.script.run.withSuccessHandler(sync).withFailureHandler(fail).clearAllDepositedLogs();
+  else if(p.t===&#x27;ovr&#x27;){
+    var it=S.incharge.find(function(x){return x.consignmentId===p.id}); if(it) it.isDepositedInSheet=(p.v===&#x27;Deposited&#x27;);
+    renderIncharge();
+    google.script.run.withSuccessHandler(sync).withFailureHandler(fail).toggleParcelStatusIncharge(p.ag,p.id,p.v);
+  } else if(p.t===&#x27;del&#x27;){
+    S.incharge=S.incharge.filter(function(x){return x.consignmentId!==p.id}); renderIncharge();
+    google.script.run.withSuccessHandler(sync).withFailureHandler(fail).removeDepositedParcel(p.id);
+  }
+}
+
+// ---------- Reminders ----------
+function remind(a){
+  var l=S.incharge.filter(function(i){return i.agentName===a&amp;&amp;!isDep(i)}); if(!l.length) return;
+  window.open(&#x27;https://api.whatsapp.com/send?text=&#x27;+encodeURIComponent(t(&#x27;remMsg&#x27;,a,l)),&#x27;_blank&#x27;);
+}
+function remindAll(){
+  var l=S.incharge.filter(function(i){return !isDep(i)}); if(!l.length) return;
+  var g={}; l.forEach(function(i){(g[i.agentName]=g[i.agentName]||[]).push(i.customerName)});
+  window.open(&#x27;https://api.whatsapp.com/send?text=&#x27;+encodeURIComponent(t(&#x27;remAllMsg&#x27;,g,l.length)),&#x27;_blank&#x27;);
+}
+
+// ---------- Single 5s refresh loop (pauses when tab hidden or while saving) ----------
+function tick(){
+  if(document.hidden||S.saves&gt;0||S.busy||$(&#x27;sug&#x27;).style.display===&#x27;block&#x27;) return;
+  if(S.mode===&#x27;admin&#x27;) fetchIncharge(true); else if(S.query) fetchData(true);
+}
+setInterval(tick,REFRESH_MS);
+document.addEventListener(&#x27;visibilitychange&#x27;,function(){if(!document.hidden) tick()});
+
+// ---------- One click handler for everything ----------
+document.addEventListener(&#x27;click&#x27;,function(e){
+  var el=e.target.closest(&#x27;[data-a]&#x27;); 
+  if(e.target.id===&#x27;setM&#x27;) $(&#x27;setM&#x27;).classList.remove(&#x27;on&#x27;);
+  if(!el){ if(!e.target.closest(&#x27;.iw&#x27;)) $(&#x27;sug&#x27;).style.display=&#x27;none&#x27;; return }
+  var a=el.dataset.a,v=el.dataset.v,id=el.dataset.id;
+  if(a===&#x27;pick&#x27;){$(&#x27;agentInput&#x27;).value=v;$(&#x27;sug&#x27;).style.display=&#x27;none&#x27;;search()}
+  else if(a===&#x27;search&#x27;){$(&#x27;sug&#x27;).style.display=&#x27;none&#x27;;search()}
+  else if(a===&#x27;dep&#x27;) deposit(id);
+  else if(a===&#x27;wa&#x27;) whatsapp();
+  else if(a===&#x27;settings&#x27;){syncSet();$(&#x27;setM&#x27;).classList.add(&#x27;on&#x27;)}
+  else if(a===&#x27;setX&#x27;) $(&#x27;setM&#x27;).classList.remove(&#x27;on&#x27;);
+  else if(a===&#x27;setLang&#x27;) setLang(v);
+  else if(a===&#x27;setTheme&#x27;) setTheme(v===&#x27;dark&#x27;);
+  else if(a===&#x27;back&#x27;) exitAdmin();
+  else if(a===&#x27;admin&#x27;){ if(S.mode===&#x27;admin&#x27;) exitAdmin(); else {$(&#x27;pinIn&#x27;).value=&#x27;&#x27;;$(&#x27;pinErr&#x27;).style.display=&#x27;none&#x27;;$(&#x27;pinM&#x27;).classList.add(&#x27;on&#x27;);setTimeout(function(){$(&#x27;pinIn&#x27;).focus()},100)} }
+  else if(a===&#x27;pinX&#x27;) $(&#x27;pinM&#x27;).classList.remove(&#x27;on&#x27;);
+  else if(a===&#x27;pinOk&#x27;) submitPin();
+  else if(a===&#x27;tab&#x27;){S.tab=v;renderIncharge()}
+  else if(a===&#x27;rem&#x27;) remind(v);
+  else if(a===&#x27;remAll&#x27;) remindAll();
+  else if(a===&#x27;ovr&#x27;) ask({t:&#x27;ovr&#x27;,ag:el.dataset.ag,id:id,v:v},v===&#x27;Deposited&#x27;?t(&#x27;ovrT&#x27;):t(&#x27;undoT&#x27;),t(&#x27;ovrP&#x27;,id,v),t(&#x27;ovrY&#x27;),v===&#x27;Deposited&#x27;?&#x27;#0B5CAD&#x27;:&#x27;#DC2626&#x27;);
+  else if(a===&#x27;del&#x27;) ask({t:&#x27;del&#x27;,id:id},t(&#x27;delT&#x27;),t(&#x27;delP&#x27;,id),t(&#x27;delY&#x27;),&#x27;#DC2626&#x27;);
+  else if(a===&#x27;clr&#x27;) ask({t:&#x27;clr&#x27;},t(&#x27;clrT&#x27;),t(&#x27;clrP&#x27;),t(&#x27;clrY&#x27;),&#x27;#B91C1C&#x27;);
+  else if(a===&#x27;cfX&#x27;){S.pending=null;$(&#x27;cfM&#x27;).classList.remove(&#x27;on&#x27;)}
+  else if(a===&#x27;cfOk&#x27;) doConfirmed();
+});
+setTheme(document.documentElement.classList.contains(&#x27;dark&#x27;));applyLang();msg(t(&#x27;empty&#x27;));
+loadAgents();
+$(&#x27;pinIn&#x27;).addEventListener(&#x27;keydown&#x27;,function(e){if(e.key===&#x27;Enter&#x27;) submitPin()});
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" allow="camera; clipboard-write; clipboard-read"></iframe></section>
+<section class="view frm" id="v-qr" hidden><div class="back"><b>QR to WhatsApp</b></div><iframe title="QR to WhatsApp" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, viewport-fit=cover&quot;&gt;
+&lt;title&gt;QR to WhatsApp&lt;/title&gt;
+&lt;style&gt;
 :root{--bg:#eef3f0;--card:#fff;--text:#10201a;--muted:#62736a;--g1:#25d366;--g2:#0e8f4b;--border:#e1e9e4;--chip:#e6f7ec;--chipt:#0e8f4b;--shadow:0 8px 30px rgba(16,60,40,.10);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b110e;--card:#151e19;--text:#e9f2ed;--muted:#8fa196;--border:#25322b;--chip:#173324;--chipt:#4be08a;--shadow:0 8px 30px rgba(0,0,0,.4)}}
-:root[data-theme="dark"]{--bg:#0b110e;--card:#151e19;--text:#e9f2ed;--muted:#8fa196;--border:#25322b;--chip:#173324;--chipt:#4be08a;--shadow:0 8px 30px rgba(0,0,0,.4)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=&quot;light&quot;]){--bg:#0b110e;--card:#151e19;--text:#e9f2ed;--muted:#8fa196;--border:#25322b;--chip:#173324;--chipt:#4be08a;--shadow:0 8px 30px rgba(0,0,0,.4)}}
+:root[data-theme=&quot;dark&quot;]{--bg:#0b110e;--card:#151e19;--text:#e9f2ed;--muted:#8fa196;--border:#25322b;--chip:#173324;--chipt:#4be08a;--shadow:0 8px 30px rgba(0,0,0,.4)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0}
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100%}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,&quot;Segoe UI&quot;,Roboto,sans-serif;min-height:100%}
 .hero{background:linear-gradient(135deg,var(--g2),var(--g1));color:#fff;padding:28px 20px 70px;border-radius:0 0 32px 32px}
 .hero .in{max-width:460px;margin:0 auto;display:flex;align-items:center;gap:12px}
 .logo{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.2);display:grid;place-items:center}
@@ -62,140 +691,140 @@ h3{margin:0 0 8px;font-size:.95rem}
 .hist small{color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(40px);background:#111;color:#fff;padding:10px 18px;border-radius:99px;font-size:.88rem;opacity:0;transition:.25s;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%)}
-</style>
-</head>
-<body>
-<div class="hero"><div class="in">
-  <div class="logo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/><path d="M13 13h4v4"/></svg></div>
-  <div><h1>QR to WhatsApp</h1><p>Scan a QR code or barcode and open WhatsApp in one tap</p></div>
-</div></div>
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;hero&quot;&gt;&lt;div class=&quot;in&quot;&gt;
+  &lt;div class=&quot;logo&quot;&gt;&lt;svg width=&quot;26&quot; height=&quot;26&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;#fff&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;&lt;path d=&quot;M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2&quot;/&gt;&lt;rect x=&quot;7&quot; y=&quot;7&quot; width=&quot;4&quot; height=&quot;4&quot;/&gt;&lt;rect x=&quot;13&quot; y=&quot;7&quot; width=&quot;4&quot; height=&quot;4&quot;/&gt;&lt;rect x=&quot;7&quot; y=&quot;13&quot; width=&quot;4&quot; height=&quot;4&quot;/&gt;&lt;path d=&quot;M13 13h4v4&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;
+  &lt;div&gt;&lt;h1&gt;QR to WhatsApp&lt;/h1&gt;&lt;p&gt;Scan a QR code or barcode and open WhatsApp in one tap&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;
 
-<div class="wrap">
-  <div class="card">
-    <div class="stage" id="stage">
-      <video id="video" playsinline muted></video>
-      <div class="frame"><i></i><i></i><i></i><i></i><b></b></div>
-      <div class="idle">
-        <svg width="84" height="84" viewBox="0 0 24 24" fill="none" stroke="#7be0a6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/><path d="M13 13h4v4"/></svg>
-        <span>Keep the QR code or barcode inside the frame</span>
-      </div>
-    </div>
-    <button class="btn" id="startBtn">📷 &nbsp;Start scanning</button>
-    <div class="row">
-      <label class="sec" for="shot"><span>📸</span>Take a photo</label>
-      <label class="sec" for="file"><span>🖼️</span>From gallery</label>
-    </div>
-    <input type="file" id="shot" accept="image/*" capture="environment" hidden>
-    <input type="file" id="file" accept="image/*" hidden>
-    <div class="note" id="status"></div>
-    <details class="man"><summary>Scan not working? Type the ID manually</summary><input id="manual" placeholder="Enter ID or text"><button class="grp" id="manualBtn">Continue</button></details>
-    <div class="diag" id="diag"></div>
-  </div>
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;stage&quot; id=&quot;stage&quot;&gt;
+      &lt;video id=&quot;video&quot; playsinline muted&gt;&lt;/video&gt;
+      &lt;div class=&quot;frame&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;b&gt;&lt;/b&gt;&lt;/div&gt;
+      &lt;div class=&quot;idle&quot;&gt;
+        &lt;svg width=&quot;84&quot; height=&quot;84&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;#7be0a6&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;&lt;path d=&quot;M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2&quot;/&gt;&lt;rect x=&quot;7&quot; y=&quot;7&quot; width=&quot;4&quot; height=&quot;4&quot;/&gt;&lt;rect x=&quot;13&quot; y=&quot;7&quot; width=&quot;4&quot; height=&quot;4&quot;/&gt;&lt;rect x=&quot;7&quot; y=&quot;13&quot; width=&quot;4&quot; height=&quot;4&quot;/&gt;&lt;path d=&quot;M13 13h4v4&quot;/&gt;&lt;/svg&gt;
+        &lt;span&gt;Keep the QR code or barcode inside the frame&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;button class=&quot;btn&quot; id=&quot;startBtn&quot;&gt;📷 &amp;nbsp;Start scanning&lt;/button&gt;
+    &lt;div class=&quot;row&quot;&gt;
+      &lt;label class=&quot;sec&quot; for=&quot;shot&quot;&gt;&lt;span&gt;📸&lt;/span&gt;Take a photo&lt;/label&gt;
+      &lt;label class=&quot;sec&quot; for=&quot;file&quot;&gt;&lt;span&gt;🖼️&lt;/span&gt;From gallery&lt;/label&gt;
+    &lt;/div&gt;
+    &lt;input type=&quot;file&quot; id=&quot;shot&quot; accept=&quot;image/*&quot; capture=&quot;environment&quot; hidden&gt;
+    &lt;input type=&quot;file&quot; id=&quot;file&quot; accept=&quot;image/*&quot; hidden&gt;
+    &lt;div class=&quot;note&quot; id=&quot;status&quot;&gt;&lt;/div&gt;
+    &lt;details class=&quot;man&quot;&gt;&lt;summary&gt;Scan not working? Type the ID manually&lt;/summary&gt;&lt;input id=&quot;manual&quot; placeholder=&quot;Enter ID or text&quot;&gt;&lt;button class=&quot;grp&quot; id=&quot;manualBtn&quot;&gt;Continue&lt;/button&gt;&lt;/details&gt;
+    &lt;div class=&quot;diag&quot; id=&quot;diag&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
 
-  <div class="card" id="result">
-    <div class="ok"><div class="tick">✓</div><span>Scanned successfully</span><div class="chip" id="chip"></div></div>
-    <div class="content" id="content"></div>
-    <button class="btn wa" id="waBtn">
-      <svg width="24" height="24" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-      <span id="waLabel">Send</span>
-    </button>
-    <button class="grp" id="grpBtn">✍️ Send with ID typed (choose group)</button>
-    <div class="hint" id="hint">Green button: opens your group and copies the ID, then Paste. Second button: ID is typed for you, you just pick the group.</div>
-    <div class="ghost"><button id="copyBtn">📋 Copy</button><button id="againBtn">🔄 Scan again</button></div>
-  </div>
+  &lt;div class=&quot;card&quot; id=&quot;result&quot;&gt;
+    &lt;div class=&quot;ok&quot;&gt;&lt;div class=&quot;tick&quot;&gt;✓&lt;/div&gt;&lt;span&gt;Scanned successfully&lt;/span&gt;&lt;div class=&quot;chip&quot; id=&quot;chip&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;content&quot; id=&quot;content&quot;&gt;&lt;/div&gt;
+    &lt;button class=&quot;btn wa&quot; id=&quot;waBtn&quot;&gt;
+      &lt;svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z&quot;/&gt;&lt;/svg&gt;
+      &lt;span id=&quot;waLabel&quot;&gt;Send&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button class=&quot;grp&quot; id=&quot;grpBtn&quot;&gt;✍️ Send with ID typed (choose group)&lt;/button&gt;
+    &lt;div class=&quot;hint&quot; id=&quot;hint&quot;&gt;Green button: opens your group and copies the ID, then Paste. Second button: ID is typed for you, you just pick the group.&lt;/div&gt;
+    &lt;div class=&quot;ghost&quot;&gt;&lt;button id=&quot;copyBtn&quot;&gt;📋 Copy&lt;/button&gt;&lt;button id=&quot;againBtn&quot;&gt;🔄 Scan again&lt;/button&gt;&lt;/div&gt;
+  &lt;/div&gt;
 
-  <div class="card" id="histCard" style="display:none">
-    <h3>Recent scans</h3>
-    <div class="hist" id="hist"></div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
+  &lt;div class=&quot;card&quot; id=&quot;histCard&quot; style=&quot;display:none&quot;&gt;
+    &lt;h3&gt;Recent scans&lt;/h3&gt;
+    &lt;div class=&quot;hist&quot; id=&quot;hist&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;toast&quot; id=&quot;toast&quot;&gt;&lt;/div&gt;
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js" onerror="var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/zxing-library/0.21.3/index.min.js';document.head.appendChild(s)"></script>
-<script>
-const $ = id => document.getElementById(id);
-const video = $('video'), stage = $('stage'), status = $('status');
+&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js&quot; onerror=&quot;var s=document.createElement(&#x27;script&#x27;);s.src=&#x27;https://cdnjs.cloudflare.com/ajax/libs/zxing-library/0.21.3/index.min.js&#x27;;document.head.appendChild(s)&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+const $ = id =&gt; document.getElementById(id);
+const video = $(&#x27;video&#x27;), stage = $(&#x27;stage&#x27;), status = $(&#x27;status&#x27;);
 // ====== PERMANENT WHATSAPP GROUP LINK: paste your link between the quotes ======
-const GROUP_LINK = 'https://chat.whatsapp.com/GuvtdoBtyJUKJjmUkSD5pZ'; // e.g. 'https://chat.whatsapp.com/AbCdEfGh123'
+const GROUP_LINK = &#x27;https://chat.whatsapp.com/GuvtdoBtyJUKJjmUkSD5pZ&#x27;; // e.g. &#x27;https://chat.whatsapp.com/AbCdEfGh123&#x27;
 // ================================================================================
-let stream = null, scanning = false, scanned = '', history = [];
-const canvas = document.createElement('canvas');
-const ctx = canvas.getContext('2d', { willReadFrequently: true });
+let stream = null, scanning = false, scanned = &#x27;&#x27;, history = [];
+const canvas = document.createElement(&#x27;canvas&#x27;);
+const ctx = canvas.getContext(&#x27;2d&#x27;, { willReadFrequently: true });
 
-const isGroup = t => /^https?:\/\/chat\.whatsapp\.com\/\S+/i.test(t.trim());
-const isLink = t => /^https?:\/\/\S+$/i.test(t.trim());
+const isGroup = t =&gt; /^https?:\/\/chat\.whatsapp\.com\/\S+/i.test(t.trim());
+const isLink = t =&gt; /^https?:\/\/\S+$/i.test(t.trim());
 
-function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
-function say(m, err){ status.textContent=m; status.className='note'+(err?' err':''); }
+function toast(m){ const t=$(&#x27;toast&#x27;); t.textContent=m; t.classList.add(&#x27;show&#x27;); setTimeout(()=&gt;t.classList.remove(&#x27;show&#x27;),1800); }
+function say(m, err){ status.textContent=m; status.className=&#x27;note&#x27;+(err?&#x27; err&#x27;:&#x27;&#x27;); }
 
-function loadHist(){ try{ history = JSON.parse(localStorage.getItem('qrhist')||'[]'); }catch(e){ history=[]; } renderHist(); }
+function loadHist(){ try{ history = JSON.parse(localStorage.getItem(&#x27;qrhist&#x27;)||&#x27;[]&#x27;); }catch(e){ history=[]; } renderHist(); }
 function saveHist(t){
-  history = [t, ...history.filter(x=>x!==t)].slice(0,5);
-  try{ localStorage.setItem('qrhist', JSON.stringify(history)); }catch(e){}
+  history = [t, ...history.filter(x=&gt;x!==t)].slice(0,5);
+  try{ localStorage.setItem(&#x27;qrhist&#x27;, JSON.stringify(history)); }catch(e){}
   renderHist();
 }
 function renderHist(){
-  $('histCard').style.display = history.length ? 'block' : 'none';
-  $('hist').innerHTML = '';
-  history.forEach(t=>{
-    const b=document.createElement('button');
-    b.innerHTML = '<span>'+(isGroup(t)?'👥':isLink(t)?'🔗':'📝')+'</span><em></em><small>Open</small>';
-    b.querySelector('em').textContent=t;
-    b.onclick=()=>showResult(t,true);
-    $('hist').appendChild(b);
+  $(&#x27;histCard&#x27;).style.display = history.length ? &#x27;block&#x27; : &#x27;none&#x27;;
+  $(&#x27;hist&#x27;).innerHTML = &#x27;&#x27;;
+  history.forEach(t=&gt;{
+    const b=document.createElement(&#x27;button&#x27;);
+    b.innerHTML = &#x27;&lt;span&gt;&#x27;+(isGroup(t)?&#x27;👥&#x27;:isLink(t)?&#x27;🔗&#x27;:&#x27;📝&#x27;)+&#x27;&lt;/span&gt;&lt;em&gt;&lt;/em&gt;&lt;small&gt;Open&lt;/small&gt;&#x27;;
+    b.querySelector(&#x27;em&#x27;).textContent=t;
+    b.onclick=()=&gt;showResult(t,true);
+    $(&#x27;hist&#x27;).appendChild(b);
   });
 }
 
-// Keep only the ID part (e.g. 'DG081026ZBSMLJ|434' -> 'DG081026ZBSMLJ')
-function cleanId(t){ return String(t).trim().split('|')[0].trim(); }
+// Keep only the ID part (e.g. &#x27;DG081026ZBSMLJ|434&#x27; -&gt; &#x27;DG081026ZBSMLJ&#x27;)
+function cleanId(t){ return String(t).trim().split(&#x27;|&#x27;)[0].trim(); }
 
 function showResult(text, fromHist){
   scanned = cleanId(text);
   stopCam();
-  $('content').textContent = scanned;
+  $(&#x27;content&#x27;).textContent = scanned;
   const g = isGroup(scanned);
-  $('chip').textContent = g ? 'WhatsApp Group' : isLink(scanned) ? 'Link' : 'Code';
-  $('waLabel').textContent = g ? 'Open WhatsApp Group' : (GROUP_LINK ? 'Send to WhatsApp Group' : 'Send ID to WhatsApp');
-  $('grpBtn').style.display = (GROUP_LINK && !g) ? 'block' : 'none';
-  $('hint').style.display = g ? 'none' : 'block';
-  $('result').style.display = 'block';
-  $('result').scrollIntoView({behavior:'smooth', block:'center'});
+  $(&#x27;chip&#x27;).textContent = g ? &#x27;WhatsApp Group&#x27; : isLink(scanned) ? &#x27;Link&#x27; : &#x27;Code&#x27;;
+  $(&#x27;waLabel&#x27;).textContent = g ? &#x27;Open WhatsApp Group&#x27; : (GROUP_LINK ? &#x27;Send to WhatsApp Group&#x27; : &#x27;Send ID to WhatsApp&#x27;);
+  $(&#x27;grpBtn&#x27;).style.display = (GROUP_LINK &amp;&amp; !g) ? &#x27;block&#x27; : &#x27;none&#x27;;
+  $(&#x27;hint&#x27;).style.display = g ? &#x27;none&#x27; : &#x27;block&#x27;;
+  $(&#x27;result&#x27;).style.display = &#x27;block&#x27;;
+  $(&#x27;result&#x27;).scrollIntoView({behavior:&#x27;smooth&#x27;, block:&#x27;center&#x27;});
   if (navigator.vibrate) navigator.vibrate(60);
   if (!fromHist) saveHist(scanned);
-  say('');
+  say(&#x27;&#x27;);
 }
 
 function stopCam(){
   scanning = false;
-  if (stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
-  stage.classList.remove('live');
-  $('startBtn').style.display = 'flex';
+  if (stream){ stream.getTracks().forEach(t=&gt;t.stop()); stream=null; }
+  stage.classList.remove(&#x27;live&#x27;);
+  $(&#x27;startBtn&#x27;).style.display = &#x27;flex&#x27;;
 }
 
 async function startCam(){
-  $('result').style.display = 'none';
-  say('Starting camera...');
+  $(&#x27;result&#x27;).style.display = &#x27;none&#x27;;
+  say(&#x27;Starting camera...&#x27;);
   try{
-    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ideal:1920}, height:{ideal:1080} } });
+    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:&#x27;environment&#x27;, width:{ideal:1920}, height:{ideal:1080} } });
     video.srcObject = stream;
     await video.play();
-    try { const tr = stream.getVideoTracks()[0], caps = tr.getCapabilities && tr.getCapabilities();
-      if (caps && caps.focusMode && caps.focusMode.includes('continuous')) await tr.applyConstraints({ advanced:[{ focusMode:'continuous' }] }); } catch(e){}
-    stage.classList.add('live');
-    $('startBtn').style.display = 'none';
-    say('Point the camera at a QR code or barcode');
+    try { const tr = stream.getVideoTracks()[0], caps = tr.getCapabilities &amp;&amp; tr.getCapabilities();
+      if (caps &amp;&amp; caps.focusMode &amp;&amp; caps.focusMode.includes(&#x27;continuous&#x27;)) await tr.applyConstraints({ advanced:[{ focusMode:&#x27;continuous&#x27; }] }); } catch(e){}
+    stage.classList.add(&#x27;live&#x27;);
+    $(&#x27;startBtn&#x27;).style.display = &#x27;none&#x27;;
+    say(&#x27;Point the camera at a QR code or barcode&#x27;);
     scanning = true;
     requestAnimationFrame(tick);
   }catch(e){
-    say('Live camera is not allowed. Open this link directly in your browser, or use "Take a photo".', true);
+    say(&#x27;Live camera is not allowed. Open this link directly in your browser, or use &quot;Take a photo&quot;.&#x27;, true);
   }
 }
 
 // ---------- Decoding engine: QR + barcodes, blurry/small codes ----------
 let zxReader = null, zxHints = null, nativeBD = null;
 function zx(){
-  if (zxReader || typeof ZXing === 'undefined') return zxReader;
+  if (zxReader || typeof ZXing === &#x27;undefined&#x27;) return zxReader;
   const F = ZXing.BarcodeFormat;
   zxHints = new Map();
   zxHints.set(ZXing.DecodeHintType.TRY_HARDER, true);
@@ -211,7 +840,7 @@ function zxDecode(cv){
   } catch(e){ return null; }
 }
 async function nativeDecode(src){
-  if (!('BarcodeDetector' in window)) return null;
+  if (!(&#x27;BarcodeDetector&#x27; in window)) return null;
   try {
     if (!nativeBD) nativeBD = new BarcodeDetector();
     const r = await nativeBD.detect(src);
@@ -219,47 +848,47 @@ async function nativeDecode(src){
   } catch(e){ return null; }
 }
 function scanCanvas(cv){
-  const d = cv.getContext('2d', { willReadFrequently:true }).getImageData(0,0,cv.width,cv.height);
-  if (typeof jsQR !== 'undefined'){
-    const q = jsQR(d.data, d.width, d.height, { inversionAttempts:'attemptBoth' });
-    if (q && q.data) return q.data;
+  const d = cv.getContext(&#x27;2d&#x27;, { willReadFrequently:true }).getImageData(0,0,cv.width,cv.height);
+  if (typeof jsQR !== &#x27;undefined&#x27;){
+    const q = jsQR(d.data, d.width, d.height, { inversionAttempts:&#x27;attemptBoth&#x27; });
+    if (q &amp;&amp; q.data) return q.data;
   }
   return zxDecode(cv);
 }
 // image enhancement (helps blurry / low-contrast / shadowed photos)
-function toGray(data){ const n=data.length/4, g=new Uint8ClampedArray(n); for(let i=0,j=0;i<n;i++,j+=4) g[i]=(data[j]*299+data[j+1]*587+data[j+2]*114)/1000; return g; }
+function toGray(data){ const n=data.length/4, g=new Uint8ClampedArray(n); for(let i=0,j=0;i&lt;n;i++,j+=4) g[i]=(data[j]*299+data[j+1]*587+data[j+2]*114)/1000; return g; }
 function stretch(g){
-  const h=new Uint32Array(256), n=g.length; for(let i=0;i<n;i++) h[g[i]]++;
-  let lo=0,hi=255,a=0; while(lo<255 && (a+=h[lo])<n*0.02) lo++; a=0; while(hi>0 && (a+=h[hi])<n*0.02) hi--;
-  if (hi-lo<20) return g;
-  const k=255/(hi-lo), o=new Uint8ClampedArray(n); for(let i=0;i<n;i++) o[i]=(g[i]-lo)*k; return o;
+  const h=new Uint32Array(256), n=g.length; for(let i=0;i&lt;n;i++) h[g[i]]++;
+  let lo=0,hi=255,a=0; while(lo&lt;255 &amp;&amp; (a+=h[lo])&lt;n*0.02) lo++; a=0; while(hi&gt;0 &amp;&amp; (a+=h[hi])&lt;n*0.02) hi--;
+  if (hi-lo&lt;20) return g;
+  const k=255/(hi-lo), o=new Uint8ClampedArray(n); for(let i=0;i&lt;n;i++) o[i]=(g[i]-lo)*k; return o;
 }
 function adaptive(g,w,h){
   const W=w+1, I=new Float64Array(W*(h+1));
-  for(let y=0;y<h;y++){ let row=0; for(let x=0;x<w;x++){ row+=g[y*w+x]; I[(y+1)*W+x+1]=I[y*W+x+1]+row; } }
+  for(let y=0;y&lt;h;y++){ let row=0; for(let x=0;x&lt;w;x++){ row+=g[y*w+x]; I[(y+1)*W+x+1]=I[y*W+x+1]+row; } }
   const r=Math.max(8,Math.round(w/16)), o=new Uint8ClampedArray(w*h);
-  for(let y=0;y<h;y++){ const y0=Math.max(0,y-r), y1=Math.min(h,y+r+1);
-    for(let x=0;x<w;x++){ const x0=Math.max(0,x-r), x1=Math.min(w,x+r+1);
+  for(let y=0;y&lt;h;y++){ const y0=Math.max(0,y-r), y1=Math.min(h,y+r+1);
+    for(let x=0;x&lt;w;x++){ const x0=Math.max(0,x-r), x1=Math.min(w,x+r+1);
       const sum=I[y1*W+x1]-I[y0*W+x1]-I[y1*W+x0]+I[y0*W+x0];
-      o[y*w+x] = g[y*w+x] < (sum/((x1-x0)*(y1-y0)))*0.88 ? 0 : 255; } }
+      o[y*w+x] = g[y*w+x] &lt; (sum/((x1-x0)*(y1-y0)))*0.88 ? 0 : 255; } }
   return o;
 }
 function grayToCanvas(g,w,h){
-  const c=document.createElement('canvas'); c.width=w; c.height=h;
-  const x=c.getContext('2d'), im=x.createImageData(w,h);
-  for(let i=0,j=0;i<g.length;i++,j+=4){ im.data[j]=im.data[j+1]=im.data[j+2]=g[i]; im.data[j+3]=255; }
+  const c=document.createElement(&#x27;canvas&#x27;); c.width=w; c.height=h;
+  const x=c.getContext(&#x27;2d&#x27;), im=x.createImageData(w,h);
+  for(let i=0,j=0;i&lt;g.length;i++,j+=4){ im.data[j]=im.data[j+1]=im.data[j+2]=g[i]; im.data[j+3]=255; }
   x.putImageData(im,0,0); return c;
 }
 function variant(cv,mode){
-  const d=cv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,cv.width,cv.height);
+  const d=cv.getContext(&#x27;2d&#x27;,{willReadFrequently:true}).getImageData(0,0,cv.width,cv.height);
   let g=stretch(toGray(d.data));
-  if (mode==='bin') g=adaptive(g,cv.width,cv.height);
+  if (mode===&#x27;bin&#x27;) g=adaptive(g,cv.width,cv.height);
   return grayToCanvas(g,cv.width,cv.height);
 }
 async function tryCanvas(cv){
   let t = await nativeDecode(cv) || scanCanvas(cv);
   if (t) return t;
-  for (const m of ['str','bin']){
+  for (const m of [&#x27;str&#x27;,&#x27;bin&#x27;]){
     const v = variant(cv,m);
     t = scanCanvas(v) || await nativeDecode(v);
     if (t) return t;
@@ -269,22 +898,22 @@ async function tryCanvas(cv){
 function cropScaled(cv,x,y,w,h){
   h = Math.min(h, cv.height - y); w = Math.min(w, cv.width - x);
   const s = Math.max(1, Math.min(3, 900 / w));
-  const o = document.createElement('canvas');
+  const o = document.createElement(&#x27;canvas&#x27;);
   o.width = Math.round(w*s); o.height = Math.round(h*s);
-  o.getContext('2d').drawImage(cv, x, y, w, h, 0, 0, o.width, o.height);
+  o.getContext(&#x27;2d&#x27;).drawImage(cv, x, y, w, h, 0, 0, o.width, o.height);
   return o;
 }
 async function decodeDeep(cv, progress){
   const W = cv.width, H = cv.height, wins = [[0,0,W,H]];
-  for (let i=0;i<5;i++) wins.push([0, H*i*0.2, W, H*0.35]);                                  // strips: barcodes
-  for (let r=0;r<3;r++) for (let c=0;c<3;c++) wins.push([W*c*0.3, H*r*0.3, W*0.4, H*0.4]);   // tiles: small QR
-  for (let i=0;i<wins.length;i++){
+  for (let i=0;i&lt;5;i++) wins.push([0, H*i*0.2, W, H*0.35]);                                  // strips: barcodes
+  for (let r=0;r&lt;3;r++) for (let c=0;c&lt;3;c++) wins.push([W*c*0.3, H*r*0.3, W*0.4, H*0.4]);   // tiles: small QR
+  for (let i=0;i&lt;wins.length;i++){
     const [x,y,w,h] = wins[i];
     const sub = i===0 ? cv : cropScaled(cv,x,y,w,h);
     const t = await tryCanvas(sub);
     if (t) return t;
     if (progress) progress(Math.round((i+1)/wins.length*100));
-    await new Promise(r => setTimeout(r));
+    await new Promise(r =&gt; setTimeout(r));
   }
   return null;
 }
@@ -293,66 +922,299 @@ let busy = false, lastTry = 0;
 async function tick(){
   if (!scanning) return;
   const now = performance.now();
-  if (!busy && now - lastTry > 120 && video.readyState === video.HAVE_ENOUGH_DATA){
+  if (!busy &amp;&amp; now - lastTry &gt; 120 &amp;&amp; video.readyState === video.HAVE_ENOUGH_DATA){
     busy = true; lastTry = now;
     try {
       canvas.width = video.videoWidth; canvas.height = video.videoHeight;
       ctx.drawImage(video,0,0);
       const t = await nativeDecode(canvas) || scanCanvas(canvas);
-      if (t && scanning){ showResult(t); return; }
+      if (t &amp;&amp; scanning){ showResult(t); return; }
     } catch(e){} finally { busy = false; }
   }
   requestAnimationFrame(tick);
 }
 
-['file','shot'].forEach(id => $(id).addEventListener('change', e => {
+[&#x27;file&#x27;,&#x27;shot&#x27;].forEach(id =&gt; $(id).addEventListener(&#x27;change&#x27;, e =&gt; {
   const f = e.target.files[0]; if(!f) return;
-  say('Reading code...');
+  say(&#x27;Reading code...&#x27;);
   const img = new Image();
-  img.onerror = () => say('Could not open this image file.', true);
-  img.onload = async () => {
+  img.onerror = () =&gt; say(&#x27;Could not open this image file.&#x27;, true);
+  img.onload = async () =&gt; {
     try {
       const k = Math.min(1, 2000 / Math.max(img.width, img.height));
       canvas.width = Math.round(img.width*k); canvas.height = Math.round(img.height*k);
       ctx.drawImage(img,0,0,canvas.width,canvas.height);
       URL.revokeObjectURL(img.src);
-      const t = await decodeDeep(canvas, p => say('Reading code... ' + p + '%'));
-      if (t) showResult(t); else say('No QR code or barcode found. Try a closer, sharper photo, or type the ID manually below.', true);
-    } catch(err){ say('Error: ' + (err && err.message || err), true); }
+      const t = await decodeDeep(canvas, p =&gt; say(&#x27;Reading code... &#x27; + p + &#x27;%&#x27;));
+      if (t) showResult(t); else say(&#x27;No QR code or barcode found. Try a closer, sharper photo, or type the ID manually below.&#x27;, true);
+    } catch(err){ say(&#x27;Error: &#x27; + (err &amp;&amp; err.message || err), true); }
   };
   img.src = URL.createObjectURL(f);
-  e.target.value = '';
+  e.target.value = &#x27;&#x27;;
 }));
 
 function fbCopy(t){
-  const a = document.createElement('textarea');
-  a.value = t; a.style.position = 'fixed'; a.style.opacity = '0';
+  const a = document.createElement(&#x27;textarea&#x27;);
+  a.value = t; a.style.position = &#x27;fixed&#x27;; a.style.opacity = &#x27;0&#x27;;
   document.body.appendChild(a); a.select();
-  try { document.execCommand('copy'); } catch(e){}
+  try { document.execCommand(&#x27;copy&#x27;); } catch(e){}
   a.remove();
 }
 function copyText(t){
-  try { if (navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(t).catch(()=>fbCopy(t)); return; } } catch(e){}
+  try { if (navigator.clipboard &amp;&amp; window.isSecureContext){ navigator.clipboard.writeText(t).catch(()=&gt;fbCopy(t)); return; } } catch(e){}
   fbCopy(t);
 }
-$('grpBtn').onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(scanned), '_blank');
-$('waBtn').onclick = () => {
-  if (GROUP_LINK && !isGroup(scanned)) {
+$(&#x27;grpBtn&#x27;).onclick = () =&gt; window.open(&#x27;https://wa.me/?text=&#x27; + encodeURIComponent(scanned), &#x27;_blank&#x27;);
+$(&#x27;waBtn&#x27;).onclick = () =&gt; {
+  if (GROUP_LINK &amp;&amp; !isGroup(scanned)) {
     copyText(scanned);
-    toast('ID copied. Paste it in the group');
-    window.open(GROUP_LINK, '_blank');
+    toast(&#x27;ID copied. Paste it in the group&#x27;);
+    window.open(GROUP_LINK, &#x27;_blank&#x27;);
     return;
   }
-  const url = isGroup(scanned) ? scanned : 'https://wa.me/?text=' + encodeURIComponent(scanned);
-  window.open(url, '_blank');
+  const url = isGroup(scanned) ? scanned : &#x27;https://wa.me/?text=&#x27; + encodeURIComponent(scanned);
+  window.open(url, &#x27;_blank&#x27;);
 };
-$('copyBtn').onclick = () => { copyText(scanned); toast('Copied ✓'); };
-$('startBtn').onclick = startCam;
-$('againBtn').onclick = startCam;
-$('manualBtn').onclick = () => { const v = $('manual').value.trim(); if (v) showResult(v); };
-function diag(){ $('diag').textContent = 'Engines: ' + [('BarcodeDetector' in window)?'Native ✓':'Native ✗', (typeof ZXing!=='undefined')?'ZXing ✓':'ZXing ✗', (typeof jsQR!=='undefined')?'jsQR ✓':'jsQR ✗'].join(' · '); }
-window.addEventListener('load', () => { diag(); setTimeout(diag, 2000); });
+$(&#x27;copyBtn&#x27;).onclick = () =&gt; { copyText(scanned); toast(&#x27;Copied ✓&#x27;); };
+$(&#x27;startBtn&#x27;).onclick = startCam;
+$(&#x27;againBtn&#x27;).onclick = startCam;
+$(&#x27;manualBtn&#x27;).onclick = () =&gt; { const v = $(&#x27;manual&#x27;).value.trim(); if (v) showResult(v); };
+function diag(){ $(&#x27;diag&#x27;).textContent = &#x27;Engines: &#x27; + [(&#x27;BarcodeDetector&#x27; in window)?&#x27;Native ✓&#x27;:&#x27;Native ✗&#x27;, (typeof ZXing!==&#x27;undefined&#x27;)?&#x27;ZXing ✓&#x27;:&#x27;ZXing ✗&#x27;, (typeof jsQR!==&#x27;undefined&#x27;)?&#x27;jsQR ✓&#x27;:&#x27;jsQR ✗&#x27;].join(&#x27; · &#x27;); }
+window.addEventListener(&#x27;load&#x27;, () =&gt; { diag(); setTimeout(diag, 2000); });
 loadHist();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" allow="camera; clipboard-write; clipboard-read"></iframe></section>
+<section class="view" id="v-weekend" hidden>
+
+<header>
+  <div class="logo"><b>pathao</b><span>courier</span></div>
+  <div class="title"><h1>Weekend <em>Roster</em></h1><p>Narsingdi-Shibpur Hub</p></div>
+</header>
+<div class="list" id="list"></div>
+<div class="foot"><span>Together for Better Deliveries</span><button id="editBtn">&#9998; Edit list</button></div>
+</section>
+
+</div>
+
+<dialog id="dlg">
+  <div class="m">
+    <h2>Weekend exchange</h2>
+    <p id="dlgSub"></p>
+    <div id="advWrap" hidden><label for="selDA">Exchange day</label><select id="selDA"></select></div>
+    <label for="selA">Your current rider</label>
+    <select id="selA"></select>
+    <label for="selB">Exchange with</label>
+    <select id="selB"></select>
+    <div class="sum" id="sum">Dui jon select korun.</div>
+    <div class="acts"><button id="cancel">Cancel</button><button class="ok" id="ok" disabled>Exchange confirm</button></div>
+  </div>
+</dialog>
+<dialog id="cfm"><div class="m cfm"><h2 id="cfmT"></h2><p id="cfmP"></p><div class="acts"><button id="cfmNo">Cancel</button><button class="ok danger" id="cfmYes">Yes</button></div></div></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+function sha256(str){
+  const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+  const K=[],pr=[];for(let c=2;pr.length<64;c++){let p=true;for(let d=2;d*d<=c;d++)if(c%d===0){p=false;break}if(p)pr.push(c)}
+  pr.forEach((c,i)=>{K[i]=Math.floor((Math.cbrt(c)%1)*4294967296)|0});
+  str=unescape(encodeURIComponent(str));const l=str.length,w=[];
+  for(let i=0;i<l;i++)w[i>>2]|=str.charCodeAt(i)<<(24-(i%4)*8);
+  w[l>>2]|=0x80<<(24-(l%4)*8);w[(((l+8)>>6)+1)*16-1]=l*8;
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  for(let o=0;o<w.length;o+=16){
+    const W=new Array(64);let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      if(i<16)W[i]=w[o+i]|0;else{const s0=rotr(W[i-15],7)^rotr(W[i-15],18)^(W[i-15]>>>3),s1=rotr(W[i-2],17)^rotr(W[i-2],19)^(W[i-2]>>>10);W[i]=(W[i-16]+s0+W[i-7]+s1)|0}
+      const S1=rotr(e,6)^rotr(e,11)^rotr(e,25),ch=(e&f)^(~e&g),t1=(h+S1+ch+K[i]+W[i])|0,S0=rotr(a,2)^rotr(a,13)^rotr(a,22),mj=(a&b)^(a&c)^(b&c),t2=(S0+mj)|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0}
+    H=[(H[0]+a)|0,(H[1]+b)|0,(H[2]+c)|0,(H[3]+d)|0,(H[4]+e)|0,(H[5]+f)|0,(H[6]+g)|0,(H[7]+h)|0]}
+  return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("");
+}
+const normPhone=v=>v.replace(/[\s\-]/g,"").replace(/^\+?88/,"");
+const PHONE_RE=/^01[3-9]\d{8}$/;
+const accHash=(ph,pw)=>sha256(ACCESS_SALT+ph+":"+pw);
+function showWho(){const t=document.getElementById("whoTxt");if(t&&user)t.textContent="👤 "+(user.name?user.name+" · ":"")+user.phone}
+(function(){
+  const g=id=>document.getElementById(id);
+  const root=document.documentElement;
+  const err=m=>{g("gErr").textContent=m||""};
+  let fails=0,lockUntil=0;
+  g("gEye").onclick=()=>{const i=g("gPass"),sh=i.type==="password";i.type=sh?"text":"password";g("gEye").textContent=sh?"Hide":"Show"};
+  ["gPhone","gPass"].forEach(id=>g(id).addEventListener("input",()=>err("")));
+  g("gForm").addEventListener("submit",ev=>{
+    ev.preventDefault();
+    const wait=Math.ceil((lockUntil-Date.now())/1000);
+    if(wait>0){err("Onek bar bhul hoyeche. "+wait+" second pore chesta korun.");return}
+    const ph=normPhone(g("gPhone").value),pw=g("gPass").value;
+    if(!PHONE_RE.test(ph)){err("Sothik 11 digit phone number din (01XXXXXXXXX).");g("gPhone").focus();return}
+    if(!pw){err("Password din.");g("gPass").focus();return}
+    const a=findAcc(ph);
+    if(!a||accHash(ph,pw)!==a.hash){
+      g("gPass").value="";
+      if(++fails>=5){fails=0;lockUntil=Date.now()+30000;err("5 bar bhul hoyeche. 30 second opekkha korun.")}
+      else{err("Number ba password thik nai.");g("gPass").focus()}
+      return}
+    fails=0;user={phone:a.phone,name:a.name||"",h:a.hash};
+    try{localStorage.setItem("wr-user",JSON.stringify(user))}catch(e){}
+    g("gPass").value="";err("");
+    if(location.hash==="#admin")history.replaceState(null,"",location.pathname+location.search);
+    root.classList.remove("locked");showWho();window.scrollTo(0,0);
+  });
+  g("logout").onclick=()=>askConfirm("Logout?","Abar Phone ar Password diye dhukte hobe.","Yes, logout",()=>{
+    user=null;try{localStorage.removeItem("wr-user")}catch(e){}
+    g("gPhone").value="";g("gPass").value="";root.classList.add("locked");
+  });
+  // admin helper (open with #admin)
+  const adm=()=>g("gAdm").classList.toggle("on",location.hash==="#admin");
+  adm();window.addEventListener("hashchange",adm);
+  g("aGen").onclick=()=>{
+    const ph=normPhone(g("aPhone").value),nm=g("aName").value.trim(),pw=g("aPass").value,o=g("aOut");
+    if(!PHONE_RE.test(ph)){o.value="Sothik 11 digit phone number din.";return}
+    if(!pw){o.value="Password din.";return}
+    o.value="{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+",hash:\""+accHash(ph,pw)+"\"},";
+    o.focus();o.select();
+  };
+  showWho();
+})();
+const DEFAULT=[
+{k:"Saturday",bn:"শনিবার",c:"#e11d2e",r:[["Shanto Mia","Dulalpur"],["Shamim Mia","Ghashirdia"],["Sayed Rayhan","Backup Rider"]]},
+{k:"Sunday",bn:"রবিবার",c:"#1a73d9",r:[["Ariful Islam","Backup Rider"],["Md Pial Hasan","Baghaba"],["Jobayer Alam Khan","Ashrafpur"]]},
+{k:"Monday",bn:"সোমবার",c:"#2e9b3e",r:[["Sajib Hossan","Itakhola"],["Jahirul Islam Robin","Chaitanya"],["Nadim Hossain Eshan","Backup Rider"]]},
+{k:"Tuesday",bn:"মঙ্গলবার",c:"#f5821f",r:[["Morad Mridha","Joynagar"],["Md Shamol Mia","Kararchar"],["Ismayel Hosen","Backup Rider"]]},
+{k:"Wednesday",bn:"বুধবার",c:"#6a35a8",r:[["MD Akram Hossain","Sadharchar"],["Shahadat Hossain","Soyadnagar"],["Arif Hossain","Backup Rider"]]},
+{k:"Thursday",bn:"বৃহস্পতিবার",c:"#17a2a8",r:[["Md Omar Faruk","Putia"],["Rafiqul Islam","Shibpur Sadar"],["Md Kabir Hossan","Backup Rider"]]}
+];
+let data=JSON.parse(JSON.stringify(DEFAULT));
+try{const s=localStorage.getItem("wr-list");if(s){const p=JSON.parse(s);if(Array.isArray(p)&&p.length===6)data=p}}catch(e){}
+const save=()=>{try{localStorage.setItem("wr-list",JSON.stringify(data))}catch(e){}};
+const $=id=>document.getElementById(id);
+// Exchange overlay: swaps affect only Home (today's weekend), never the Weekend List (data)
+let swaps=[];try{const x=JSON.parse(localStorage.getItem("wr-swaps")||"[]");if(Array.isArray(x))swaps=x}catch(e){}
+const saveSwaps=()=>{try{localStorage.setItem("wr-swaps",JSON.stringify(swaps))}catch(e){}};
+function eff(){const e=JSON.parse(JSON.stringify(data));
+  swaps.forEach(s=>{const A=e[s.si]&&e[s.si].r[s.a],B=e[s.bi]&&e[s.bi].r[s.bj];if(A&&B){e[s.si].r[s.a]=B;e[s.bi].r[s.bj]=A}}); // whole row (name + road) moves together
+  return e}
+// keep swap positions valid when a rider row is removed from the list
+function shiftSwaps(i,j){
+  swaps=swaps.filter(s=>!((s.si===i&&s.a===j)||(s.bi===i&&s.bj===j)));
+  swaps.forEach(s=>{if(s.si===i&&s.a>j)s.a--;if(s.bi===i&&s.bj>j)s.bj--});
+  saveSwaps()}
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// aj kon din? (Friday list e nei, tai porer listed din dhora hoy)
+const jsDay=new Date().getDay(); // 0 Sun..6 Sat
+const order=["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
+const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+let todayKey=names[jsDay]; if(todayKey==="Friday")todayKey="Saturday";
+const todayIdx=order.indexOf(todayKey);
+const isReal=names[jsDay]===todayKey;
+
+let cfmCb=null;
+function askConfirm(title,text,yes,cb){$("cfmT").textContent=title;$("cfmP").textContent=text;$("cfmYes").textContent=yes;cfmCb=cb;$("cfm").showModal()}
+$("cfmNo").onclick=()=>{cfmCb=null;$("cfm").close()};
+$("cfmYes").onclick=()=>{const c=cfmCb;cfmCb=null;$("cfm").close();if(c)c()};
+let editing=false;
+function render(){
+  $("list").innerHTML=data.map((d,i)=>{
+    const t=i===todayIdx;
+    const names=editing?d.r.map((x,j)=>`<div><input data-i="${i}" data-j="${j}" data-f="0" value="${esc(x[0])}" placeholder="Name" aria-label="Name"></div>`).join(""):d.r.map(x=>`<div>${esc(x[0])}</div>`).join("");
+    const roads=editing?d.r.map((x,j)=>`<div><input data-i="${i}" data-j="${j}" data-f="1" value="${esc(x[1])}" placeholder="Road" aria-label="Road"><button class="del" data-i="${i}" data-j="${j}" title="Remove" aria-label="Remove rider">&#10005;</button></div>`).join(""):d.r.map(x=>`<div>${esc(x[1])}</div>`).join("");
+    return `<section class="day${t?" today":""}" style="--c:${d.c}">
+      <div class="lab"><b>${d.k}</b></div>
+      <div class="hd n">Name</div><div class="hd r">Road</div>
+      <div class="col names">${names}</div>
+      <div class="col roads">${roads}</div>
+      ${editing?`<div class="dayname"><button class="add" data-i="${i}">+ Add rider</button></div>`:""}
+    </section>`}).join("");
+  document.querySelectorAll("#list input").forEach(inp=>inp.oninput=()=>{
+    data[+inp.dataset.i].r[+inp.dataset.j][+inp.dataset.f]=inp.value;save();renderHome();
+  });
+  document.querySelectorAll("#list .del").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i,j=+b.dataset.j;
+    askConfirm("Remove rider?",`Remove ${data[i].r[j][0]||"this rider"} from ${data[i].k}?`,"Yes, remove",()=>{shiftSwaps(i,j);data[i].r.splice(j,1);save();render();renderHome()});
+  });
+  document.querySelectorAll("#list .add").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;data[i].r.push(["",""]);save();render();renderHome();
+    const ins=document.querySelectorAll(`#list input[data-i="${i}"][data-f="0"]`);if(ins.length)ins[ins.length-1].focus();
+  });
+  const eb=$("editBtn");if(eb)eb.innerHTML=editing?"&#10003; Done":"&#9998; Edit list";
+}
+$("editBtn").onclick=()=>{editing=!editing;
+  if(!editing){data.forEach((d,i)=>{for(let j=d.r.length-1;j>=0;j--){const x=d.r[j];if(!(x[0].trim()||x[1].trim())){shiftSwaps(i,j);d.r.splice(j,1)}}});save();renderHome()}
+  render()};
+
+let advMode=false;
+const srcIdx=()=>advMode?(+$("selDA").value):todayIdx;
+function fillA(){const t=eff()[srcIdx()];
+  $("selA").innerHTML=`<option value="">-- select --</option>`+t.r.map((x,j)=>`<option value="${j}">${esc(x[0])}</option>`).join("");}
+function fillB(){const si=srcIdx();const E=eff();
+  $("selB").innerHTML=`<option value="">-- select --</option>`+E.map((d,i)=>i===si?"":`<optgroup label="${d.k}">${d.r.map((x,j)=>`<option value="${i}-${j}">${esc(x[0])}</option>`).join("")}</optgroup>`).join("");}
+function openDlg(adv){
+  advMode=adv===true;
+  $("advWrap").hidden=!advMode;
+  $("dlg").querySelector("h2").textContent=advMode?"Advance weekend exchange":"Weekend exchange";
+  if(advMode){
+    $("selDA").innerHTML=data.map((d,i)=>`<option value="${i}">${d.k}</option>`).join("");
+    $("selDA").value=todayIdx;
+    $("dlgSub").textContent="Pick any upcoming weekend day and rider, then choose a rider from another day to exchange with in advance.";
+  }else{
+    $("dlgSub").textContent=`Select your name from ${data[todayIdx].k}, then choose a rider from another day to exchange weekends.`;
+  }
+  fillA();fillB();upd();$("dlg").showModal();
+}
+const openAdv=()=>openDlg(true);
+function upd(){
+  const a=$("selA").value,b=$("selB").value,ok=$("ok");
+  if(a===""||b===""){$("sum").textContent="Select both riders to continue.";ok.disabled=true;return}
+  const si=srcIdx(),E=eff();
+  const [bi,bj]=b.split("-").map(Number);
+  const A=E[si].r[a][0],B=E[bi].r[bj][0];
+  $("sum").innerHTML=`<b>${esc(A)}</b> ekhon <b>${E[bi].k}</b> e jabe, ar <b>${esc(B)}</b> ashbe <b>${E[si].k}</b> e.`;
+  ok.disabled=false;
+}
+$("selA").onchange=upd;$("selB").onchange=upd;
+$("selDA").onchange=()=>{fillA();fillB();upd()};
+$("cancel").onclick=()=>$("dlg").close();
+$("ok").onclick=()=>{
+  const si=srcIdx(),E=eff();
+  const a=+$("selA").value,[bi,bj]=$("selB").value.split("-").map(Number);
+  const nA=E[si].r[a][0],nB=E[bi].r[bj][0];
+  swaps.push({si,a,bi,bj});saveSwaps();   // Weekend List (data) is NOT touched
+  logSwap(nA,nB,E[si],E[bi]);
+  renderHome();$("dlg").close();
+  const el=$("toast");el.textContent=`Exchange complete: ${nA} ⇄ ${nB}`;el.classList.add("on");setTimeout(()=>el.classList.remove("on"),3000);
+};
+render();
+
+// ---- Home / navigation ----
+const VIEWS=["home","ret","qr","weekend"];
+function loadFrame(id){const f=document.querySelector("#v-"+id+" iframe");if(f&&!f.srcdoc&&f.dataset.srcdoc)f.srcdoc=f.dataset.srcdoc}
+let currentView="home"; let navGuard=false;
+function show(v,fromPop=false){
+  if(v!=="home"&&!fromPop){history.pushState({panelView:v},"");navGuard=true;}
+  currentView=v;VIEWS.forEach(x=>$("v-"+x).hidden=x!==v);loadFrame(v);if(v==="home")renderHome();window.scrollTo(0,0);
+}
+window.addEventListener("popstate",()=>{if(currentView!=="home"){show("home",true);}else{currentView="home";}});
+document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>show(b.dataset.v));
+document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{if(currentView!=="home"&&history.state&&history.state.panelView){history.back()}else{show("home",true)}});
+
+function renderHome(){
+  const d=eff()[todayIdx];
+  const dt=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+  $("today").style.setProperty("--c",d.c);
+  $("today").innerHTML=`<div class="th"><div><small>${isReal?"TODAY’S WEEKEND":"UPCOMING WEEKEND"}</small><b>${d.k}</b></div><span>${dt}</span><div class="thr"><button class="exh" id="exBtn">&#8644; Exchange weekend</button><button class="exh adv" id="advBtn">&#9201; Advance exchange</button></div></div><div class="tr">${d.r.map(x=>`<div><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join("")}</div>`;
+  $("exBtn").onclick=()=>openDlg(false);$("advBtn").onclick=openAdv;
+  $("logList").innerHTML=log.length?log.map(l=>`<div class="lg"><b>${esc(l.a)}</b> &#8644; <b>${esc(l.b)}</b><div class="mut">${l.da} &#8596; ${l.db} &bull; ${esc(l.t)}</div></div>`).join(""):`<div class="mut">No weekend exchanges yet.</div>`;
+}
+let log=[];try{log=JSON.parse(localStorage.getItem("wr-log")||"[]")}catch(e){}
+function logSwap(a,b,dA,dB){
+  log.unshift({a,b,da:dA.k,db:dB.k,t:new Date().toLocaleString()});log=log.slice(0,100);
+  try{localStorage.setItem("wr-log",JSON.stringify(log))}catch(e){}
+}
+$("logClear").onclick=()=>askConfirm("Clear history?","All weekend exchange history will be deleted and Home will go back to the Weekend List.","Yes, clear",()=>{log=[];swaps=[];try{localStorage.removeItem("wr-log");localStorage.removeItem("wr-swaps")}catch(e){}renderHome()});
+renderHome();
 </script>
 </body>
 </html>
