@@ -175,6 +175,7 @@ const ACCOUNTS=[
   {phone:"01991103890",name:"Ali Hossain",role:"admin",hash:"838ada84ce4d58ad4540665aaf05ee2b02ec6959a03c88e9ff339f1ce99e0df2"},
 ];
 // ===================================================================
+const BASE=ACCOUNTS.map(a=>Object.assign({},a));
 try{(JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).forEach(a=>{if(a&&a.phone&&a.hash){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}})}catch(e){}
 try{const rm=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[];for(let i=ACCOUNTS.length-1;i>=0;i--)if(rm.indexOf(ACCOUNTS[i].phone)>-1)ACCOUNTS.splice(i,1)}catch(e){}
 const findAcc=ph=>ACCOUNTS.find(a=>a.phone===ph);
@@ -198,6 +199,7 @@ let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch
 <div class="err" id="gErr" role="alert"></div>
 <button class="go" type="submit">Login</button>
 </form>
+<div style="text-align:center;margin-top:12px;font-size:10px;color:#9aa8ba">build 15-Oct-4</div>
 </div>
 </div>
 <div class="wrap">
@@ -1122,12 +1124,22 @@ function applyRole(){
     const ph=normPhone(g("gPhone").value),pw=g("gPass").value;
     if(!PHONE_RE.test(ph)){err("Sothik 11 digit phone number din (01XXXXXXXXX).");g("gPhone").focus();return}
     if(!pw){err("Password din.");g("gPass").focus();return}
-    const a=findAcc(ph);
-    if(!a||accHash(ph,pw)!==a.hash){
+    let rmv=[];try{rmv=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]}catch(e){}
+    const cur=findAcc(ph),cands=[cur];
+    if(rmv.indexOf(ph)<0)BASE.forEach(b=>{if(b.phone===ph)cands.push(b)});
+    const pws=pw.trim()===pw?[pw]:[pw,pw.trim()];   // phone keyboards often add a trailing space
+    let a=null;
+    for(const c of cands){if(!c)continue;if(pws.some(w=>accHash(ph,w)===c.hash)){a=c;break}}
+    if(!a){
+      const had=cands.some(Boolean);
       g("gPass").value="";
       if(++fails>=5){fails=0;lockUntil=Date.now()+30000;err("5 bar bhul hoyeche. 30 second opekkha korun.")}
-      else{err("Number ba password thik nai.");g("gPass").focus()}
+      else{err(had?"Password thik nai.":"Ei number e kono access nei.");g("gPass").focus()}
       return}
+    if(a!==cur){ // matched the file's own account: drop any stale browser-stored override
+      const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a);
+      try{localStorage.setItem("wr-extra",JSON.stringify((JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).filter(x=>x.phone!==ph)))}catch(e){}
+    }
     fails=0;user={phone:a.phone,name:a.name||"",h:a.hash,role:a.role==="admin"?"admin":"user"};
     try{localStorage.setItem("wr-user",JSON.stringify(user))}catch(e){}
     g("gPass").value="";err("");
