@@ -161,7 +161,8 @@ html.locked,html.locked body{overflow:hidden}
 .psec #logout{color:#c62828;border-color:#f3c9c9;background:#fdecec}
 #v-qr iframe{height:calc(100vh - 82px - env(safe-area-inset-top,0px));height:calc(100dvh - 82px - env(safe-area-inset-top,0px))}
 @media(max-width:760px){#v-ret{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}}
-#v-ret{background:linear-gradient(90deg,#101a2d 0%,#172b49 52%,#263c5a 100%) top left/100% env(safe-area-inset-top,0px) no-repeat}
+#v-ret{padding-top:0;background:none}
+#v-ret iframe{border:0;height:100vh;height:100dvh}
 </style>
 <script>
 // ================= ACCESS CONFIG (owner sets this) =================
@@ -331,6 +332,7 @@ header .logo span{display:block;font-size:7px;margin-top:3px;letter-spacing:1.2p
 header .ttl span,header.admin .ttl span{margin-top:6px;font-size:11.5px;font-weight:600;letter-spacing:.3px;color:#d7e5f2}
 header .dot{width:7px;height:7px;box-shadow:0 0 0 3px rgba(74,222,128,.12)}
 header .ib,header.admin .ib{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff}
+header:before{content:&quot;OPERATIONS WORKSPACE&quot;;position:absolute;top:calc(var(--sat) + 3px);right:20px;color:rgba(255,255,255,.44);font-size:8px;font-weight:800;letter-spacing:1.6px;line-height:1}
 &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -1276,7 +1278,7 @@ render();
 
 // ---- Home / navigation ----
 const VIEWS=["home","ret","qr","weekend"];
-function loadFrame(id){const f=document.querySelector("#v-"+id+" iframe");if(f&&!f.srcdoc&&f.dataset.srcdoc)f.srcdoc=f.dataset.srcdoc}
+function loadFrame(id){const f=document.querySelector("#v-"+id+" iframe");if(f&&!f.srcdoc&&f.dataset.srcdoc){f.addEventListener("load",()=>{try{const pr=document.createElement("div");pr.style.cssText="position:fixed;top:0;visibility:hidden;padding-top:env(safe-area-inset-top,0px)";document.body.appendChild(pr);const px=parseFloat(getComputedStyle(pr).paddingTop)||0;pr.remove();if(px>0)f.contentDocument.documentElement.style.setProperty("--sat",px+"px")}catch(e){}});f.srcdoc=f.dataset.srcdoc}}
 let currentView="home"; let navGuard=false;
 function show(v,fromPop=false){
   if(v!=="home"&&!fromPop){history.pushState({panelView:v},"");navGuard=true;}
