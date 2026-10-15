@@ -98,7 +98,7 @@ html,body{overscroll-behavior-y:none}
 /* ---- Login gate ---- */
 #gate{display:none;position:fixed;inset:0;z-index:99999;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 18px);background:linear-gradient(118deg,#101a2d 0%,#172b49 55%,#263c5a 100%);overflow-y:auto}
 html.locked #gate{display:flex}
-html.locked .wrap,html.locked dialog,html.locked #toast{display:none!important}
+html.locked .wrap,html.locked dialog:not(#admDlg),html.locked #toast{display:none!important}
 html.locked,html.locked body{overflow:hidden}
 #gate .gc{margin:auto;width:100%;max-width:400px;background:#fff;border-radius:22px;padding:26px 22px 22px;box-shadow:0 30px 70px rgba(0,0,0,.35)}
 #gate .gl{display:flex;align-items:center;gap:12px;margin-bottom:18px}
@@ -113,25 +113,34 @@ html.locked,html.locked body{overflow:hidden}
 #gate .err{min-height:18px;margin:10px 0 0;font-size:12.5px;color:#d0192f;font-weight:600}
 #gate .go{width:100%;margin-top:6px;border:0;border-radius:13px;padding:14px;font:inherit;font-size:15px;font-weight:800;color:#fff;background:var(--red);cursor:pointer}
 #gate .go:active{transform:scale(.99)}
-#gate .adm{display:none;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
-#gate .adm.on{display:block}
-#gate .adm h3{margin:0 0 2px;font-size:14px;color:var(--navy)}
-#gate .adm p{margin:0 0 4px;font-size:11.5px;color:var(--muted)}
-#gate .adm textarea{width:100%;min-height:74px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;padding:10px;border:1.5px solid var(--line);border-radius:12px;background:#f8fafd;color:var(--ink);resize:vertical;margin-top:10px}
-#gate .adm .go{background:var(--navy);padding:11px;font-size:13px}
+.m input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px}
+.m textarea{width:100%;min-height:78px;margin-top:12px;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fafd;color:var(--ink);resize:vertical}
+#admDlg .m{max-height:88vh;max-height:88dvh;overflow-y:auto}
+#admDlg .hint{margin:8px 0 0;font-size:12px}
+#admList{max-height:176px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:0 12px}
+#admList .ar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+#admList .ar:last-child{border:0}#admList .ar div{display:flex;flex-direction:column;min-width:0}
+#admList .ar span{color:var(--muted);font-size:12px}
+.rb{font-style:normal;font-size:10px;font-weight:800;letter-spacing:.6px;padding:3px 8px;border-radius:999px;background:#eef3fb;color:#51637a;margin-left:4px;flex:none}
+.rb.ad{background:#fde8ea;color:#c40f2b}
+.who .wr{display:flex;gap:6px;flex:none}
+.who #admBtn{color:#1a73d9}
 .who{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;color:var(--ink)}
 .who span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .who button{flex:none;border:1px solid var(--line);background:#fff;color:var(--red);font:inherit;font-size:12px;font-weight:700;border-radius:10px;padding:6px 11px;cursor:pointer}
 </style>
 <script>
 // ================= ACCESS CONFIG (owner sets this) =================
-// Add one line per rider:  {phone:"01XXXXXXXXX", name:"Optional name", hash:"..."},
-// hash = SHA-256 of  ACCESS_SALT + phone + ":" + password
-// Easy way to make a line: open this file with  #admin  at the end of the address, fill Phone + Password, copy the line.
-// To remove a rider's access: delete their line. To change a password: replace their hash.
+// One line per person:  {phone:"01XXXXXXXXX", name:"Optional name", role:"admin", hash:"..."},
+//   role:"admin" = Admin Access.  Leave role out (or "user") = User Access.
+//   hash = SHA-256 of  ACCESS_SALT + phone + ":" + password
+// To make a line: login as admin -> tap "Admin" (or open this file with #admin at the end of the address),
+// fill the form, copy the line and paste it below.
+// Remove access: delete the line. Change password or role: replace the line.
 const ACCESS_SALT="pathao-nsd:";
 const ACCOUNTS=[
-  {phone:"01700000000",name:"Demo Rider",hash:"2d3eaab2c91d8856ee883be060a209d9cbd26f00f679c9c9b490e3520046013d"}, // DEMO (password: pathao123) -- DELETE THIS LINE
+  {phone:"01700000000",name:"Demo Admin",role:"admin",hash:"2d3eaab2c91d8856ee883be060a209d9cbd26f00f679c9c9b490e3520046013d"}, // DEMO (password: pathao123) -- DELETE THIS LINE
+  {phone:"01800000000",name:"Demo Rider",hash:"93d07b8037e8fb81cf32d8378db52204a977ecc363a08e813e2372ecc6d2b409"}, // DEMO (password: rider123) -- DELETE THIS LINE
 ];
 // ===================================================================
 const findAcc=ph=>ACCOUNTS.find(a=>a.phone===ph);
@@ -139,7 +148,7 @@ let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch
 (function(){
   const a=user&&findAcc(user.phone);
   if(!a||a.hash!==user.h){user=null;try{localStorage.removeItem("wr-user")}catch(e){}document.documentElement.classList.add("locked")}
-  if(location.hash==="#admin")document.documentElement.classList.add("locked");
+  else user.role=a.role==="admin"?"admin":"user"; // role always comes from the config, not from storage
 })();
 </script>
 </head>
@@ -155,28 +164,20 @@ let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch
 <div class="err" id="gErr" role="alert"></div>
 <button class="go" type="submit">Login</button>
 </form>
-<div class="adm" id="gAdm">
-<h3>Admin: rider add korun</h3><p>Phone, password (ar chaile name) diye line banan, tarpor config e paste korun.</p>
-<label for="aPhone">Phone</label><input id="aPhone" type="tel" inputmode="numeric" placeholder="01XXXXXXXXX" autocomplete="off">
-<label for="aName">Name (optional)</label><input id="aName" type="text" placeholder="Rider name" autocomplete="off">
-<label for="aPass">Password</label><input id="aPass" type="text" placeholder="Password" autocomplete="off">
-<button class="go" type="button" id="aGen" style="margin-top:12px">Line banan</button>
-<textarea id="aOut" readonly placeholder="Ekhane line ashbe"></textarea>
-</div>
 </div>
 </div>
 <div class="wrap">
 <section id="v-home">
 <header><div class="logo"><b>pathao</b><span>courier</span></div><div class="title"><h1>Rider <em>Panel</em></h1><p>Narsingdi-Shibpur Hub</p></div></header>
 <div class="home">
-<div class="who"><span id="whoTxt"></span><button id="logout" type="button">Logout</button></div>
+<div class="who"><span id="whoTxt"></span><div class="wr"><button id="admBtn" type="button" data-adm>⚙ Admin</button><button id="logout" type="button">Logout</button></div></div>
 <div class="today" id="today"></div>
 <div class="big3">
 <button data-v="ret" style="--b:#e11d2e"><i>📦</i>Return Parcel</button>
 <button data-v="qr" style="--b:#1fa855"><i>💬</i>QR to WhatsApp</button>
 <button data-v="weekend" style="--b:#1a73d9"><i>📅</i>Weekend List</button>
 </div>
-<div class="log"><div class="lh"><h2>Weekend exchange</h2><button id="logClear">Clear</button></div><div id="logList"></div></div>
+<div class="log"><div class="lh"><h2>Weekend exchange</h2><button id="logClear" data-adm>Clear</button></div><div id="logList"></div></div>
 </div>
 </section>
 <section class="view frm" id="v-ret" hidden><iframe title="Return Parcel" data-srcdoc="&lt;!DOCTYPE html&gt;
@@ -993,7 +994,7 @@ loadHist();
   <div class="title"><h1>Weekend <em>Roster</em></h1><p>Narsingdi-Shibpur Hub</p></div>
 </header>
 <div class="list" id="list"></div>
-<div class="foot"><span>Together for Better Deliveries</span><button id="editBtn">&#9998; Edit list</button></div>
+<div class="foot"><span>Together for Better Deliveries</span><button id="editBtn" data-adm>&#9998; Edit list</button></div>
 </section>
 
 </div>
@@ -1012,6 +1013,19 @@ loadHist();
   </div>
 </dialog>
 <dialog id="cfm"><div class="m cfm"><h2 id="cfmT"></h2><p id="cfmP"></p><div class="acts"><button id="cfmNo">Cancel</button><button class="ok danger" id="cfmYes">Yes</button></div></div></dialog>
+<dialog id="admDlg"><div class="m">
+<h2>Admin</h2>
+<p>Notun rider er access line banan.</p>
+<div id="admListBox"><label>Access list</label><div id="admList"></div></div>
+<label for="aPhone">Phone</label><input id="aPhone" type="tel" inputmode="numeric" placeholder="01XXXXXXXXX" autocomplete="off">
+<label for="aName">Name (optional)</label><input id="aName" type="text" placeholder="Rider name" autocomplete="off">
+<label for="aPass">Password</label><input id="aPass" type="text" placeholder="Password" autocomplete="off">
+<label for="aRole">Access</label><select id="aRole"><option value="user">User Access</option><option value="admin">Admin Access</option></select>
+<div class="acts"><button class="ok" id="aGen" type="button">Line banan</button></div>
+<textarea id="aOut" readonly placeholder="Ekhane line ashbe"></textarea>
+<p class="hint">Line ta file er ACCOUNTS list e paste korun.</p>
+<div class="acts"><button id="admClose" type="button">Close</button></div>
+</div></dialog>
 <div id="toast" role="status"></div>
 
 <script>
@@ -1035,7 +1049,17 @@ function sha256(str){
 const normPhone=v=>v.replace(/[\s\-]/g,"").replace(/^\+?88/,"");
 const PHONE_RE=/^01[3-9]\d{8}$/;
 const accHash=(ph,pw)=>sha256(ACCESS_SALT+ph+":"+pw);
-function showWho(){const t=document.getElementById("whoTxt");if(t&&user)t.textContent="👤 "+(user.name?user.name+" · ":"")+user.phone}
+const isAdmin=()=>!!user&&user.role==="admin";
+function showWho(){const t=document.getElementById("whoTxt");if(!t||!user)return;
+  t.textContent="👤 "+(user.name?user.name+" · ":"")+user.phone;
+  const b=document.createElement("b");b.className="rb"+(isAdmin()?" ad":"");b.textContent=isAdmin()?"ADMIN":"USER";t.appendChild(b)}
+// Admin Access shows the admin-only controls; User Access hides them
+function applyRole(){
+  const ad=isAdmin();
+  document.querySelectorAll("[data-adm]").forEach(el=>{el.style.display=ad?"":"none"});
+  if(!ad&&editing){editing=false;render()}
+  showWho();
+}
 (function(){
   const g=id=>document.getElementById(id);
   const root=document.documentElement;
@@ -1056,27 +1080,15 @@ function showWho(){const t=document.getElementById("whoTxt");if(t&&user)t.textCo
       if(++fails>=5){fails=0;lockUntil=Date.now()+30000;err("5 bar bhul hoyeche. 30 second opekkha korun.")}
       else{err("Number ba password thik nai.");g("gPass").focus()}
       return}
-    fails=0;user={phone:a.phone,name:a.name||"",h:a.hash};
+    fails=0;user={phone:a.phone,name:a.name||"",h:a.hash,role:a.role==="admin"?"admin":"user"};
     try{localStorage.setItem("wr-user",JSON.stringify(user))}catch(e){}
     g("gPass").value="";err("");
-    if(location.hash==="#admin")history.replaceState(null,"",location.pathname+location.search);
-    root.classList.remove("locked");showWho();window.scrollTo(0,0);
+    root.classList.remove("locked");applyRole();window.scrollTo(0,0);
   });
   g("logout").onclick=()=>askConfirm("Logout?","Abar Phone ar Password diye dhukte hobe.","Yes, logout",()=>{
     user=null;try{localStorage.removeItem("wr-user")}catch(e){}
-    g("gPhone").value="";g("gPass").value="";root.classList.add("locked");
+    g("gPhone").value="";g("gPass").value="";root.classList.add("locked");applyRole();
   });
-  // admin helper (open with #admin)
-  const adm=()=>g("gAdm").classList.toggle("on",location.hash==="#admin");
-  adm();window.addEventListener("hashchange",adm);
-  g("aGen").onclick=()=>{
-    const ph=normPhone(g("aPhone").value),nm=g("aName").value.trim(),pw=g("aPass").value,o=g("aOut");
-    if(!PHONE_RE.test(ph)){o.value="Sothik 11 digit phone number din.";return}
-    if(!pw){o.value="Password din.";return}
-    o.value="{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+",hash:\""+accHash(ph,pw)+"\"},";
-    o.focus();o.select();
-  };
-  showWho();
 })();
 const DEFAULT=[
 {k:"Saturday",bn:"শনিবার",c:"#e11d2e",r:[["Shanto Mia","Dulalpur"],["Shamim Mia","Ghashirdia"],["Sayed Rayhan","Backup Rider"]]},
@@ -1141,7 +1153,7 @@ function render(){
   });
   const eb=$("editBtn");if(eb)eb.innerHTML=editing?"&#10003; Done":"&#9998; Edit list";
 }
-$("editBtn").onclick=()=>{editing=!editing;
+$("editBtn").onclick=()=>{if(!isAdmin())return;editing=!editing;
   if(!editing){data.forEach((d,i)=>{for(let j=d.r.length-1;j>=0;j--){const x=d.r[j];if(!(x[0].trim()||x[1].trim())){shiftSwaps(i,j);d.r.splice(j,1)}}});save();renderHome()}
   render()};
 
@@ -1213,8 +1225,32 @@ function logSwap(a,b,dA,dB){
   log.unshift({a,b,da:dA.k,db:dB.k,t:new Date().toLocaleString()});log=log.slice(0,100);
   try{localStorage.setItem("wr-log",JSON.stringify(log))}catch(e){}
 }
-$("logClear").onclick=()=>askConfirm("Clear history?","All weekend exchange history will be deleted and Home will go back to the Weekend List.","Yes, clear",()=>{log=[];swaps=[];try{localStorage.removeItem("wr-log");localStorage.removeItem("wr-swaps")}catch(e){}renderHome()});
+$("logClear").onclick=()=>isAdmin()&&askConfirm("Clear history?","All weekend exchange history will be deleted and Home will go back to the Weekend List.","Yes, clear",()=>{log=[];swaps=[];try{localStorage.removeItem("wr-log");localStorage.removeItem("wr-swaps")}catch(e){}renderHome()});
 renderHome();
+
+// ---- Admin dialog: access list + line generator ----
+(function(){
+  const g=id=>document.getElementById(id),dlg=g("admDlg");
+  function fillList(){
+    const box=g("admListBox");
+    if(!isAdmin()){box.hidden=true;return}
+    box.hidden=false;
+    g("admList").innerHTML=ACCOUNTS.map(a=>`<div class="ar"><div><b>${esc(a.name||"—")}</b><span>${esc(a.phone)}</span></div><i class="rb${a.role==="admin"?" ad":""}">${a.role==="admin"?"ADMIN":"USER"}</i></div>`).join("")||`<div class="ar">Kono account nei.</div>`;
+  }
+  function open(){fillList();g("aOut").value="";dlg.showModal()}
+  g("admBtn").onclick=()=>{if(isAdmin())open()};
+  g("admClose").onclick=()=>dlg.close();
+  dlg.addEventListener("close",()=>{if(location.hash==="#admin")history.replaceState(null,"",location.pathname+location.search)});
+  g("aGen").onclick=()=>{
+    const ph=normPhone(g("aPhone").value),nm=g("aName").value.trim(),pw=g("aPass").value,role=g("aRole").value,o=g("aOut");
+    if(!PHONE_RE.test(ph)){o.value="Sothik 11 digit phone number din.";return}
+    if(!pw){o.value="Password din.";return}
+    o.value="{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+(role==="admin"?",role:\"admin\"":"")+",hash:\""+accHash(ph,pw)+"\"},";
+    o.focus();o.select();
+  };
+  if(location.hash==="#admin")open();
+})();
+applyRole();
 </script>
 </body>
 </html>
