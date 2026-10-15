@@ -143,6 +143,7 @@ const ACCOUNTS=[
   {phone:"01800000000",name:"Demo Rider",hash:"93d07b8037e8fb81cf32d8378db52204a977ecc363a08e813e2372ecc6d2b409"}, // DEMO (password: rider123) -- DELETE THIS LINE
 ];
 // ===================================================================
+try{(JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).forEach(a=>{if(a&&a.phone&&a.hash){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}})}catch(e){}
 const findAcc=ph=>ACCOUNTS.find(a=>a.phone===ph);
 let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch(e){}
 (function(){
@@ -1021,9 +1022,9 @@ loadHist();
 <label for="aName">Name (optional)</label><input id="aName" type="text" placeholder="Rider name" autocomplete="off">
 <label for="aPass">Password</label><input id="aPass" type="text" placeholder="Password" autocomplete="off">
 <label for="aRole">Access</label><select id="aRole"><option value="user">User Access</option><option value="admin">Admin Access</option></select>
-<div class="acts"><button class="ok" id="aGen" type="button">Line banan</button></div>
+<div class="acts"><button class="ok" id="aGen" type="button">Done</button></div>
 <textarea id="aOut" readonly placeholder="Ekhane line ashbe"></textarea>
-<p class="hint">Line ta file er ACCOUNTS list e paste korun.</p>
+<p class="hint">Done dile ei device e sathe sathe access set hoye jabe. Onno device e dite chaile upore-r line ta file er ACCOUNTS list e paste korun.</p>
 <div class="acts"><button id="admClose" type="button">Close</button></div>
 </div></dialog>
 <div id="toast" role="status"></div>
@@ -1245,8 +1246,16 @@ renderHome();
     const ph=normPhone(g("aPhone").value),nm=g("aName").value.trim(),pw=g("aPass").value,role=g("aRole").value,o=g("aOut");
     if(!PHONE_RE.test(ph)){o.value="Sothik 11 digit phone number din.";return}
     if(!pw){o.value="Password din.";return}
-    o.value="{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+(role==="admin"?",role:\"admin\"":"")+",hash:\""+accHash(ph,pw)+"\"},";
-    o.focus();o.select();
+    const hs=accHash(ph,pw);
+    o.value="{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+(role==="admin"?",role:\"admin\"":"")+",hash:\""+hs+"\"},";
+    const acc={phone:ph,hash:hs};if(nm)acc.name=nm;if(role==="admin")acc.role="admin";
+    let ex=[];try{ex=JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]}catch(e){}
+    ex=ex.filter(x=>x.phone!==ph);ex.push(acc);
+    try{localStorage.setItem("wr-extra",JSON.stringify(ex))}catch(e){o.value="Save hoy nai (browser storage bondho).";return}
+    const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS[i]=acc;else ACCOUNTS.push(acc);
+    fillList();
+    g("aPhone").value="";g("aName").value="";g("aPass").value="";g("aRole").value="user";
+    o.value="\u2713 Done! "+(nm||ph)+" er access set hoyeche.\n\nOnno device er jonno ei line ta file e paste korun:\n"+o.value;
   };
   if(location.hash==="#admin")open();
 })();
