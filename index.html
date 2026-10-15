@@ -172,6 +172,7 @@ const ACCESS_SALT="pathao-nsd:";
 const ACCOUNTS=[
   {phone:"01700000000",name:"Demo Admin",role:"admin",hash:"2d3eaab2c91d8856ee883be060a209d9cbd26f00f679c9c9b490e3520046013d"}, // DEMO (password: pathao123) -- DELETE THIS LINE
   {phone:"01800000000",name:"Demo Rider",hash:"93d07b8037e8fb81cf32d8378db52204a977ecc363a08e813e2372ecc6d2b409"}, // DEMO (password: rider123) -- DELETE THIS LINE
+  {phone:"01991103890",name:"Ali Hossain",role:"admin",hash:"838ada84ce4d58ad4540665aaf05ee2b02ec6959a03c88e9ff339f1ce99e0df2"},
 ];
 // ===================================================================
 try{(JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).forEach(a=>{if(a&&a.phone&&a.hash){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}})}catch(e){}
