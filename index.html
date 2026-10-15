@@ -168,6 +168,11 @@ html.locked,html.locked body{overflow:hidden}
 // To make a line: login as admin -> tap "Admin" (or open this file with #admin at the end of the address),
 // fill the form, copy the line and paste it below.
 // Remove access: delete the line. Change password or role: replace the line.
+// ===== REAL-TIME SYNC (Firebase Realtime Database) =====
+// Paste your database URL between the quotes, e.g. "https://my-project-default-rtdb.firebaseio.com"
+// Leave empty = old behaviour (this device only).
+const DB_URL="https://rider-penal-default-rtdb.firebaseio.com";
+function sync(k,v){if(window.__sync)window.__sync(k,v)}
 const ACCESS_SALT="pathao-nsd:";
 const ACCOUNTS=[
   {phone:"01700000000",name:"Demo Admin",role:"admin",hash:"2d3eaab2c91d8856ee883be060a209d9cbd26f00f679c9c9b490e3520046013d"}, // DEMO (password: pathao123) -- DELETE THIS LINE
@@ -175,7 +180,6 @@ const ACCOUNTS=[
   {phone:"01991103890",name:"Ali Hossain",role:"admin",hash:"838ada84ce4d58ad4540665aaf05ee2b02ec6959a03c88e9ff339f1ce99e0df2"},
 ];
 // ===================================================================
-const BASE=ACCOUNTS.map(a=>Object.assign({},a));
 try{(JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).forEach(a=>{if(a&&a.phone&&a.hash){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}})}catch(e){}
 try{const rm=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[];for(let i=ACCOUNTS.length-1;i>=0;i--)if(rm.indexOf(ACCOUNTS[i].phone)>-1)ACCOUNTS.splice(i,1)}catch(e){}
 const findAcc=ph=>ACCOUNTS.find(a=>a.phone===ph);
@@ -1124,22 +1128,13 @@ function applyRole(){
     const ph=normPhone(g("gPhone").value),pw=g("gPass").value;
     if(!PHONE_RE.test(ph)){err("Sothik 11 digit phone number din (01XXXXXXXXX).");g("gPhone").focus();return}
     if(!pw){err("Password din.");g("gPass").focus();return}
-    let rmv=[];try{rmv=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]}catch(e){}
-    const cur=findAcc(ph),cands=[cur];
-    if(rmv.indexOf(ph)<0)BASE.forEach(b=>{if(b.phone===ph)cands.push(b)});
+    const a=findAcc(ph);   // the current password only: a changed password replaces the old one
     const pws=pw.trim()===pw?[pw]:[pw,pw.trim()];   // phone keyboards often add a trailing space
-    let a=null;
-    for(const c of cands){if(!c)continue;if(pws.some(w=>accHash(ph,w)===c.hash)){a=c;break}}
-    if(!a){
-      const had=cands.some(Boolean);
+    if(!a||!pws.some(w=>accHash(ph,w)===a.hash)){
       g("gPass").value="";
       if(++fails>=5){fails=0;lockUntil=Date.now()+30000;err("5 bar bhul hoyeche. 30 second opekkha korun.")}
-      else{err(had?"Password thik nai.":"Ei number e kono access nei.");g("gPass").focus()}
+      else{err(a?"Password thik nai.":"Ei number e kono access nei.");g("gPass").focus()}
       return}
-    if(a!==cur){ // matched the file's own account: drop any stale browser-stored override
-      const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a);
-      try{localStorage.setItem("wr-extra",JSON.stringify((JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).filter(x=>x.phone!==ph)))}catch(e){}
-    }
     fails=0;user={phone:a.phone,name:a.name||"",h:a.hash,role:a.role==="admin"?"admin":"user"};
     try{localStorage.setItem("wr-user",JSON.stringify(user))}catch(e){}
     g("gPass").value="";err("");
@@ -1160,11 +1155,11 @@ const DEFAULT=[
 ];
 let data=JSON.parse(JSON.stringify(DEFAULT));
 try{const s=localStorage.getItem("wr-list");if(s){const p=JSON.parse(s);if(Array.isArray(p)&&p.length===6)data=p}}catch(e){}
-const save=()=>{try{localStorage.setItem("wr-list",JSON.stringify(data))}catch(e){}};
+const save=()=>{try{localStorage.setItem("wr-list",JSON.stringify(data))}catch(e){}sync("list",data)};
 const $=id=>document.getElementById(id);
 // Exchange overlay: swaps affect only Home (today's weekend), never the Weekend List (data)
 let swaps=[];try{const x=JSON.parse(localStorage.getItem("wr-swaps")||"[]");if(Array.isArray(x))swaps=x}catch(e){}
-const saveSwaps=()=>{try{localStorage.setItem("wr-swaps",JSON.stringify(swaps))}catch(e){}};
+const saveSwaps=()=>{try{localStorage.setItem("wr-swaps",JSON.stringify(swaps))}catch(e){}sync("swaps",swaps)};
 function eff(){const e=JSON.parse(JSON.stringify(data));
   swaps.forEach(s=>{const A=e[s.si]&&e[s.si].r[s.a],B=e[s.bi]&&e[s.bi].r[s.bj];if(A&&B){e[s.si].r[s.a]=B;e[s.bi].r[s.bj]=A}}); // whole row (name + road) moves together
   return e}
@@ -1284,8 +1279,9 @@ let log=[];try{log=JSON.parse(localStorage.getItem("wr-log")||"[]")}catch(e){}
 function logSwap(a,b,dA,dB){
   log.unshift({a,b,da:dA.k,db:dB.k,t:new Date().toLocaleString()});log=log.slice(0,100);
   try{localStorage.setItem("wr-log",JSON.stringify(log))}catch(e){}
+  sync("log",log);
 }
-$("logClear").onclick=()=>isAdmin()&&askConfirm("Clear history?","All weekend exchange history will be deleted and Home will go back to the Weekend List.","Yes, clear",()=>{log=[];swaps=[];try{localStorage.removeItem("wr-log");localStorage.removeItem("wr-swaps")}catch(e){}renderHome()});
+$("logClear").onclick=()=>isAdmin()&&askConfirm("Clear history?","All weekend exchange history will be deleted and Home will go back to the Weekend List.","Yes, clear",()=>{log=[];swaps=[];try{localStorage.removeItem("wr-log");localStorage.removeItem("wr-swaps")}catch(e){}sync("log",[]);sync("swaps",[]);renderHome()});
 renderHome();
 
 // ---- Admin dialog: access list + line generator ----
@@ -1310,6 +1306,7 @@ renderHome();
         let rm=[];try{rm=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]}catch(x){}
         if(rm.indexOf(ph)<0)rm.push(ph);
         localStorage.setItem("wr-removed",JSON.stringify(rm));
+        sync("extra",ex.filter(x=>x.phone!==ph));sync("removed",rm);
       }catch(x){g("aOut").value="Remove save hoy nai (browser storage bondho).";return}
       const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS.splice(i,1);
       try{localStorage.removeItem("wr-prof-"+ph)}catch(x){}
@@ -1326,8 +1323,9 @@ renderHome();
     const acc={phone:ph,hash:hs};if(nm)acc.name=nm;if(role==="admin")acc.role="admin";
     let ex=[];try{ex=JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]}catch(e){}
     ex=ex.filter(x=>x.phone!==ph);ex.push(acc);
-    try{localStorage.setItem("wr-removed",JSON.stringify((JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]).filter(x=>x!==ph)))}catch(e){}
+    try{const rm2=(JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]).filter(x=>x!==ph);localStorage.setItem("wr-removed",JSON.stringify(rm2));sync("removed",rm2)}catch(e){}
     try{localStorage.setItem("wr-extra",JSON.stringify(ex))}catch(e){o.value="Save hoy nai (browser storage bondho).";return}
+    sync("extra",ex);
     const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS[i]=acc;else ACCOUNTS.push(acc);
     fillList();
     g("aPhone").value="";g("aName").value="";g("aPass").value="";g("aRole").value="user";
@@ -1370,10 +1368,63 @@ renderHome();
   g("admBtn").addEventListener("click",()=>dlg.close());
   g("pSave").onclick=()=>{
     if(!user)return;
-    try{localStorage.setItem("wr-prof-"+user.phone,JSON.stringify({name:g("pName").value.trim().slice(0,40),pic:pic}))}
+    try{const pv={name:g("pName").value.trim().slice(0,40),pic:pic};localStorage.setItem("wr-prof-"+user.phone,JSON.stringify(pv));sync("prof_"+user.phone,pv)}
     catch(e){g("pErr").textContent="Could not save (storage is full or blocked).";return}
     showWho();dlg.close();
   };
+})();
+// ---- Real-time sync engine ----
+(function(){
+  if(!DB_URL)return;
+  const base=DB_URL.replace(/\/+$/,"")+"/pathao";
+  const LS={list:"wr-list",swaps:"wr-swaps",log:"wr-log",extra:"wr-extra",removed:"wr-removed"};
+  const lsKey=k=>LS[k]||(k.indexOf("prof_")===0?"wr-prof-"+k.slice(5):null);
+  const cur=k=>{try{return localStorage.getItem(lsKey(k))}catch(e){return null}};
+  const put=(k,v)=>fetch(base+"/"+encodeURIComponent(k)+".json",{method:"PUT",body:JSON.stringify(JSON.stringify(v))}).catch(()=>{});
+  let ready=false;
+  window.__sync=(k,v)=>{put(k,v)};
+  function checkSession(){
+    if(!user)return;
+    const a=findAcc(user.phone);
+    if(!a||a.hash!==user.h){
+      user=null;try{localStorage.removeItem("wr-user")}catch(e){}
+      const pd=$("profDlg");if(pd&&pd.open)pd.close();
+      document.documentElement.classList.add("locked");applyRole();
+    }else{user.role=a.role==="admin"?"admin":"user";applyRole()}
+  }
+  function applyKey(k,str){
+    const lk=lsKey(k);if(!lk||typeof str!=="string")return;
+    if(cur(k)===str)return;
+    let v;try{v=JSON.parse(str)}catch(e){return}
+    try{localStorage.setItem(lk,str)}catch(e){}
+    if(k==="list"){if(Array.isArray(v)&&v.length===6){data=v;if(!editing)render();renderHome()}}
+    else if(k==="swaps"){if(Array.isArray(v)){swaps=v;renderHome()}}
+    else if(k==="log"){if(Array.isArray(v)){log=v;renderHome()}}
+    else if(k==="extra"){(v||[]).forEach(a=>{if(a&&a.phone&&a.hash){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}});checkSession()}
+    else if(k==="removed"){(v||[]).forEach(ph=>{const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS.splice(i,1)});checkSession()}
+    else if(k.indexOf("prof_")===0){if(user&&k==="prof_"+user.phone)showWho()}
+  }
+  function seed(remote){
+    Object.keys(LS).forEach(k=>{if(remote[k]==null){const c=cur(k);if(c)put(k,JSON.parse(c))}});
+    if(user&&remote["prof_"+user.phone]==null){const c=cur("prof_"+user.phone);if(c&&c!=="{}")put("prof_"+user.phone,JSON.parse(c))}
+  }
+  function handle(path,d,isPatch){
+    if(path==="/"){
+      if(d&&typeof d==="object"){Object.keys(d).forEach(k=>applyKey(k,d[k]));if(!ready&&!isPatch){ready=true;seed(d)}}
+      else if(!ready){ready=true;seed({})}
+    }else{
+      const k=decodeURIComponent(path.slice(1));
+      if(typeof d==="string")applyKey(k,d);
+    }
+  }
+  function connect(){
+    let es;try{es=new EventSource(base+".json")}catch(e){return}
+    es.addEventListener("put",e=>{try{const m=JSON.parse(e.data);handle(m.path,m.data,false)}catch(x){}});
+    es.addEventListener("patch",e=>{try{const m=JSON.parse(e.data);handle(m.path,m.data,true)}catch(x){}});
+    es.onerror=()=>{es.close();setTimeout(connect,3000)};
+  }
+  connect();
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)fetch(base+".json").then(r=>r.json()).then(d=>{if(d&&typeof d==="object")Object.keys(d).forEach(k=>applyKey(k,d[k]))}).catch(()=>{})});
 })();
 applyRole();
 </script>
