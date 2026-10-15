@@ -173,6 +173,10 @@ html.locked,html.locked body{overflow:hidden}
 // Leave empty = old behaviour (this device only).
 const DB_URL="https://rider-penal-default-rtdb.firebaseio.com";
 function sync(k,v){if(window.__sync)window.__sync(k,v)}
+// PRIMARY OWNER: always Admin, cannot be removed or edited by anyone else,
+// and is the only one who can give/remove Admin access. Change the phone to transfer ownership.
+const OWNER_PHONE="01991103890";
+const roleOf=a=>(a&&(a.phone===OWNER_PHONE||a.role==="admin"))?"admin":"user";
 const ACCESS_SALT="pathao-nsd:";
 const ACCOUNTS=[
   {phone:"01700000000",name:"Demo Admin",role:"admin",hash:"2d3eaab2c91d8856ee883be060a209d9cbd26f00f679c9c9b490e3520046013d"}, // DEMO (password: pathao123) -- DELETE THIS LINE
@@ -180,14 +184,14 @@ const ACCOUNTS=[
   {phone:"01991103890",name:"Ali Hossain",role:"admin",hash:"838ada84ce4d58ad4540665aaf05ee2b02ec6959a03c88e9ff339f1ce99e0df2"},
 ];
 // ===================================================================
-try{(JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).forEach(a=>{if(a&&a.phone&&a.hash){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}})}catch(e){}
-try{const rm=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[];for(let i=ACCOUNTS.length-1;i>=0;i--)if(rm.indexOf(ACCOUNTS[i].phone)>-1)ACCOUNTS.splice(i,1)}catch(e){}
+try{(JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).forEach(a=>{if(a&&a.phone&&a.hash&&a.phone!==OWNER_PHONE){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}})}catch(e){}
+try{const rm=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[];for(let i=ACCOUNTS.length-1;i>=0;i--)if(rm.indexOf(ACCOUNTS[i].phone)>-1&&ACCOUNTS[i].phone!==OWNER_PHONE)ACCOUNTS.splice(i,1)}catch(e){}
 const findAcc=ph=>ACCOUNTS.find(a=>a.phone===ph);
 let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch(e){}
 (function(){
   const a=user&&findAcc(user.phone);
   if(!a||a.hash!==user.h){user=null;try{localStorage.removeItem("wr-user")}catch(e){}document.documentElement.classList.add("locked")}
-  else user.role=a.role==="admin"?"admin":"user"; // role always comes from the config, not from storage
+  else user.role=roleOf(a); // role always comes from the config, not from storage
 })();
 </script>
 </head>
@@ -1097,6 +1101,7 @@ const normPhone=v=>v.replace(/[\s\-]/g,"").replace(/^\+?88/,"");
 const PHONE_RE=/^01[3-9]\d{8}$/;
 const accHash=(ph,pw)=>sha256(ACCESS_SALT+ph+":"+pw);
 const isAdmin=()=>!!user&&user.role==="admin";
+const isOwner=()=>!!user&&user.phone===OWNER_PHONE;
 function getProf(){try{return JSON.parse(localStorage.getItem("wr-prof-"+user.phone)||"{}")||{}}catch(e){return {}}}
 function fillAv(el,pic,txt){el.textContent="";
   if(pic){const im=document.createElement("img");im.alt="";im.src=pic;el.appendChild(im)}
@@ -1106,7 +1111,7 @@ function showWho(){const h=document.getElementById("hdAv");if(!h||!user)return;
   fillAv(h,p.pic,nm||user.phone);
   document.getElementById("pTitle").textContent=nm||user.phone;
   document.getElementById("pSub").textContent=user.phone;
-  const r=document.getElementById("pRole");r.className="rb"+(isAdmin()?" ad":"");r.textContent=isAdmin()?"ADMIN":"USER"}
+  const r=document.getElementById("pRole");r.className="rb"+(isAdmin()?" ad":"");r.textContent=isOwner()?"OWNER":isAdmin()?"ADMIN":"USER"}
 // Admin Access shows the admin-only controls; User Access hides them
 function applyRole(){
   const ad=isAdmin();
@@ -1135,7 +1140,7 @@ function applyRole(){
       if(++fails>=5){fails=0;lockUntil=Date.now()+30000;err("5 bar bhul hoyeche. 30 second opekkha korun.")}
       else{err(a?"Password thik nai.":"Ei number e kono access nei.");g("gPass").focus()}
       return}
-    fails=0;user={phone:a.phone,name:a.name||"",h:a.hash,role:a.role==="admin"?"admin":"user"};
+    fails=0;user={phone:a.phone,name:a.name||"",h:a.hash,role:roleOf(a)};
     try{localStorage.setItem("wr-user",JSON.stringify(user))}catch(e){}
     g("gPass").value="";err("");
     root.classList.remove("locked");applyRole();window.scrollTo(0,0);
@@ -1291,14 +1296,14 @@ renderHome();
     const box=g("admListBox");
     if(!isAdmin()){box.hidden=true;return}
     box.hidden=false;
-    g("admList").innerHTML=ACCOUNTS.map(a=>`<div class="ar"><div><b>${esc(a.name||"—")}</b><span>${esc(a.phone)}</span></div><em class="ac"><i class="rb${a.role==="admin"?" ad":""}">${a.role==="admin"?"ADMIN":"USER"}</i>${user&&a.phone===user.phone?"":`<button class="rmv" type="button" data-ph="${esc(a.phone)}">Remove</button>`}</em></div>`).join("")||`<div class="ar">Kono account nei.</div>`;
+    g("admList").innerHTML=ACCOUNTS.map(a=>`<div class="ar"><div><b>${esc(a.name||"—")}</b><span>${esc(a.phone)}</span></div><em class="ac"><i class="rb${roleOf(a)==="admin"?" ad":""}">${a.phone===OWNER_PHONE?"OWNER":roleOf(a)==="admin"?"ADMIN":"USER"}</i>${(user&&a.phone===user.phone)||a.phone===OWNER_PHONE||(roleOf(a)==="admin"&&!isOwner())?"":`<button class="rmv" type="button" data-ph="${esc(a.phone)}">Remove</button>`}</em></div>`).join("")||`<div class="ar">Kono account nei.</div>`;
   }
-  function open(){fillList();g("aOut").value="";dlg.showModal()}
+  function open(){fillList();g("aOut").value="";const ao=g("aRole").querySelector('option[value="admin"]');if(ao){ao.hidden=!isOwner();ao.disabled=!isOwner()}g("aRole").value="user";dlg.showModal()}
   g("admBtn").onclick=()=>{if(isAdmin())open()};
   g("admClose").onclick=()=>dlg.close();
   g("admList").addEventListener("click",e=>{
     const b=e.target.closest(".rmv");if(!b||!isAdmin())return;
-    const ph=b.dataset.ph,a=findAcc(ph);if(!a||ph===user.phone)return;
+    const ph=b.dataset.ph,a=findAcc(ph);if(!a||ph===user.phone||ph===OWNER_PHONE)return;if(roleOf(a)==="admin"&&!isOwner())return;
     askConfirm("Remove access?",(a.name?a.name+" ("+ph+")":ph)+" ar login korte parbe na.","Yes, remove",()=>{
       try{
         let ex=[];try{ex=JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]}catch(x){}
@@ -1318,6 +1323,13 @@ renderHome();
     const ph=normPhone(g("aPhone").value),nm=g("aName").value.trim(),pw=g("aPass").value,role=g("aRole").value,o=g("aOut");
     if(!PHONE_RE.test(ph)){o.value="Sothik 11 digit phone number din.";return}
     if(!pw){o.value="Password din.";return}
+    if(ph===OWNER_PHONE){
+      if(!isOwner()){o.value="Owner account e kono poriborton kora jabe na.";return}
+      o.value="Owner password file theke bodlate hoy. File er ACCOUNTS list e Owner er line ta ei line diye replace korun:\n{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+",role:\"admin\",hash:\""+accHash(ph,pw)+"\"},";
+      return}
+    const ex0=findAcc(ph);
+    if(ex0&&roleOf(ex0)==="admin"&&!isOwner()){o.value="Admin account sudhu Owner bodlate parbe.";return}
+    if(role==="admin"&&!isOwner()){o.value="Admin access sudhu Owner dite parbe.";return}
     const hs=accHash(ph,pw);
     o.value="{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+(role==="admin"?",role:\"admin\"":"")+",hash:\""+hs+"\"},";
     const acc={phone:ph,hash:hs};if(nm)acc.name=nm;if(role==="admin")acc.role="admin";
@@ -1390,7 +1402,7 @@ renderHome();
       user=null;try{localStorage.removeItem("wr-user")}catch(e){}
       const pd=$("profDlg");if(pd&&pd.open)pd.close();
       document.documentElement.classList.add("locked");applyRole();
-    }else{user.role=a.role==="admin"?"admin":"user";applyRole()}
+    }else{user.role=roleOf(a);applyRole()}
   }
   function applyKey(k,str){
     const lk=lsKey(k);if(!lk||typeof str!=="string")return;
@@ -1400,8 +1412,8 @@ renderHome();
     if(k==="list"){if(Array.isArray(v)&&v.length===6){data=v;if(!editing)render();renderHome()}}
     else if(k==="swaps"){if(Array.isArray(v)){swaps=v;renderHome()}}
     else if(k==="log"){if(Array.isArray(v)){log=v;renderHome()}}
-    else if(k==="extra"){(v||[]).forEach(a=>{if(a&&a.phone&&a.hash){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}});checkSession()}
-    else if(k==="removed"){(v||[]).forEach(ph=>{const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS.splice(i,1)});checkSession()}
+    else if(k==="extra"){(v||[]).forEach(a=>{if(a&&a.phone&&a.hash&&a.phone!==OWNER_PHONE){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}});checkSession()}
+    else if(k==="removed"){(v||[]).forEach(ph=>{if(ph===OWNER_PHONE)return;const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS.splice(i,1)});checkSession()}
     else if(k.indexOf("prof_")===0){if(user&&k==="prof_"+user.phone)showWho()}
   }
   function seed(remote){
