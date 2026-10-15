@@ -128,6 +128,21 @@ html.locked,html.locked body{overflow:hidden}
 .who{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;color:var(--ink)}
 .who span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .who button{flex:none;border:1px solid var(--line);background:#fff;color:var(--red);font:inherit;font-size:12px;font-weight:700;border-radius:10px;padding:6px 11px;cursor:pointer}
+/* ---- Profile ---- */
+#whoTxt{display:flex;align-items:center;min-width:0}
+.who .av,.pav{flex:none;border-radius:50%;background:linear-gradient(145deg,#f32b49,#c90d2b);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;overflow:hidden}
+.who .av{width:34px;height:34px;font-size:15px;margin-right:9px}
+.pav{width:84px;height:84px;font-size:34px;box-shadow:0 6px 16px rgba(16,42,67,.18)}
+.av img,.pav img{width:100%;height:100%;object-fit:cover;display:block}
+.pa{display:flex;align-items:center;gap:16px;margin:4px 0 6px}
+.pab{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.pbtn{display:inline-block;font:inherit;font-size:13px;font-weight:700;padding:9px 13px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.pbtn.dg{color:#c62828;border-color:#f3c9c9}
+#pErr{min-height:16px;margin:8px 0 0;font-size:12.5px;color:#d0192f;font-weight:600}
+.who #profBtn{color:#1a73d9}
+@media(max-width:480px){.who .wr{gap:4px}.who .wr button{padding:6px 8px}.who .av{width:30px;height:30px;margin-right:7px}}
+.ac{display:flex;align-items:center;gap:8px;font-style:normal;flex:none}
+.rmv{font:inherit;font-size:11px;font-weight:700;border:1px solid #f3c9c9;background:#fdecec;color:#c62828;border-radius:8px;padding:5px 9px;cursor:pointer}
 </style>
 <script>
 // ================= ACCESS CONFIG (owner sets this) =================
@@ -144,6 +159,7 @@ const ACCOUNTS=[
 ];
 // ===================================================================
 try{(JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]).forEach(a=>{if(a&&a.phone&&a.hash){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}})}catch(e){}
+try{const rm=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[];for(let i=ACCOUNTS.length-1;i>=0;i--)if(rm.indexOf(ACCOUNTS[i].phone)>-1)ACCOUNTS.splice(i,1)}catch(e){}
 const findAcc=ph=>ACCOUNTS.find(a=>a.phone===ph);
 let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch(e){}
 (function(){
@@ -171,7 +187,7 @@ let user=null;try{user=JSON.parse(localStorage.getItem("wr-user")||"null")}catch
 <section id="v-home">
 <header><div class="logo"><b>pathao</b><span>courier</span></div><div class="title"><h1>Rider <em>Panel</em></h1><p>Narsingdi-Shibpur Hub</p></div></header>
 <div class="home">
-<div class="who"><span id="whoTxt"></span><div class="wr"><button id="admBtn" type="button" data-adm>⚙ Admin</button><button id="logout" type="button">Logout</button></div></div>
+<div class="who"><span id="whoTxt"></span><div class="wr"><button id="profBtn" type="button">Profile</button><button id="admBtn" type="button" data-adm>⚙ Admin</button><button id="logout" type="button">Logout</button></div></div>
 <div class="today" id="today"></div>
 <div class="big3">
 <button data-v="ret" style="--b:#e11d2e"><i>📦</i>Return Parcel</button>
@@ -1024,8 +1040,17 @@ loadHist();
 <label for="aRole">Access</label><select id="aRole"><option value="user">User Access</option><option value="admin">Admin Access</option></select>
 <div class="acts"><button class="ok" id="aGen" type="button">Done</button></div>
 <textarea id="aOut" readonly placeholder="Ekhane line ashbe"></textarea>
-<p class="hint">Done dile ei device e sathe sathe access set hoye jabe. Onno device e dite chaile upore-r line ta file er ACCOUNTS list e paste korun.</p>
+<p class="hint">Done dile ei device e sathe sathe access set hoye jabe. Onno device e dite chaile upore-r line ta file er ACCOUNTS list e paste korun. Remove-o ei device e kaj kore; shob device theke tulte file theke oi rider er line delete korun.</p>
 <div class="acts"><button id="admClose" type="button">Close</button></div>
+</div></dialog>
+<dialog id="profDlg"><div class="m">
+<h2>Profile</h2>
+<p>Set your name and profile picture.</p>
+<div class="pa"><span class="pav" id="pAv"></span>
+<div class="pab"><label class="pbtn" for="pFile">Change photo</label><input id="pFile" type="file" accept="image/*" hidden><button type="button" class="pbtn dg" id="pRm">Remove photo</button></div></div>
+<label for="pName">Name</label><input id="pName" type="text" maxlength="40" placeholder="Your name" autocomplete="off">
+<div id="pErr" role="alert"></div>
+<div class="acts"><button id="pCancel" type="button">Cancel</button><button class="ok" id="pSave" type="button">Save</button></div>
 </div></dialog>
 <div id="toast" role="status"></div>
 
@@ -1051,9 +1076,16 @@ const normPhone=v=>v.replace(/[\s\-]/g,"").replace(/^\+?88/,"");
 const PHONE_RE=/^01[3-9]\d{8}$/;
 const accHash=(ph,pw)=>sha256(ACCESS_SALT+ph+":"+pw);
 const isAdmin=()=>!!user&&user.role==="admin";
+function getProf(){try{return JSON.parse(localStorage.getItem("wr-prof-"+user.phone)||"{}")||{}}catch(e){return {}}}
 function showWho(){const t=document.getElementById("whoTxt");if(!t||!user)return;
-  t.textContent="👤 "+(user.name?user.name+" · ":"")+user.phone;
-  const b=document.createElement("b");b.className="rb"+(isAdmin()?" ad":"");b.textContent=isAdmin()?"ADMIN":"USER";t.appendChild(b)}
+  const p=getProf(),nm=p.name||user.name||"";
+  t.textContent="";
+  const av=document.createElement("span");av.className="av";
+  if(p.pic){const im=document.createElement("img");im.alt="";im.src=p.pic;av.appendChild(im)}
+  else av.textContent=(nm||user.phone).trim().charAt(0).toUpperCase();
+  const tx=document.createElement("span");tx.className="wn";tx.textContent=nm?nm+" · "+user.phone:user.phone;
+  const b=document.createElement("b");b.className="rb"+(isAdmin()?" ad":"");b.textContent=isAdmin()?"ADMIN":"USER";
+  t.appendChild(av);t.appendChild(tx);t.appendChild(b)}
 // Admin Access shows the admin-only controls; User Access hides them
 function applyRole(){
   const ad=isAdmin();
@@ -1236,11 +1268,27 @@ renderHome();
     const box=g("admListBox");
     if(!isAdmin()){box.hidden=true;return}
     box.hidden=false;
-    g("admList").innerHTML=ACCOUNTS.map(a=>`<div class="ar"><div><b>${esc(a.name||"—")}</b><span>${esc(a.phone)}</span></div><i class="rb${a.role==="admin"?" ad":""}">${a.role==="admin"?"ADMIN":"USER"}</i></div>`).join("")||`<div class="ar">Kono account nei.</div>`;
+    g("admList").innerHTML=ACCOUNTS.map(a=>`<div class="ar"><div><b>${esc(a.name||"—")}</b><span>${esc(a.phone)}</span></div><em class="ac"><i class="rb${a.role==="admin"?" ad":""}">${a.role==="admin"?"ADMIN":"USER"}</i>${user&&a.phone===user.phone?"":`<button class="rmv" type="button" data-ph="${esc(a.phone)}">Remove</button>`}</em></div>`).join("")||`<div class="ar">Kono account nei.</div>`;
   }
   function open(){fillList();g("aOut").value="";dlg.showModal()}
   g("admBtn").onclick=()=>{if(isAdmin())open()};
   g("admClose").onclick=()=>dlg.close();
+  g("admList").addEventListener("click",e=>{
+    const b=e.target.closest(".rmv");if(!b||!isAdmin())return;
+    const ph=b.dataset.ph,a=findAcc(ph);if(!a||ph===user.phone)return;
+    askConfirm("Remove access?",(a.name?a.name+" ("+ph+")":ph)+" ar login korte parbe na.","Yes, remove",()=>{
+      try{
+        let ex=[];try{ex=JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]}catch(x){}
+        localStorage.setItem("wr-extra",JSON.stringify(ex.filter(x=>x.phone!==ph)));
+        let rm=[];try{rm=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]}catch(x){}
+        if(rm.indexOf(ph)<0)rm.push(ph);
+        localStorage.setItem("wr-removed",JSON.stringify(rm));
+      }catch(x){g("aOut").value="Remove save hoy nai (browser storage bondho).";return}
+      const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS.splice(i,1);
+      try{localStorage.removeItem("wr-prof-"+ph)}catch(x){}
+      fillList();g("aOut").value="\u2713 "+(a.name||ph)+" er access remove hoyeche.";
+    });
+  });
   dlg.addEventListener("close",()=>{if(location.hash==="#admin")history.replaceState(null,"",location.pathname+location.search)});
   g("aGen").onclick=()=>{
     const ph=normPhone(g("aPhone").value),nm=g("aName").value.trim(),pw=g("aPass").value,role=g("aRole").value,o=g("aOut");
@@ -1251,6 +1299,7 @@ renderHome();
     const acc={phone:ph,hash:hs};if(nm)acc.name=nm;if(role==="admin")acc.role="admin";
     let ex=[];try{ex=JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]}catch(e){}
     ex=ex.filter(x=>x.phone!==ph);ex.push(acc);
+    try{localStorage.setItem("wr-removed",JSON.stringify((JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]).filter(x=>x!==ph)))}catch(e){}
     try{localStorage.setItem("wr-extra",JSON.stringify(ex))}catch(e){o.value="Save hoy nai (browser storage bondho).";return}
     const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS[i]=acc;else ACCOUNTS.push(acc);
     fillList();
@@ -1258,6 +1307,45 @@ renderHome();
     o.value="\u2713 Done! "+(nm||ph)+" er access set hoyeche.\n\nOnno device er jonno ei line ta file e paste korun:\n"+o.value;
   };
   if(location.hash==="#admin")open();
+})();
+(function(){
+  const g=id=>document.getElementById(id),dlg=g("profDlg");
+  let pic="";
+  function paint(){
+    const nm=g("pName").value.trim()||(user&&(user.name||user.phone))||"?",av=g("pAv");
+    av.textContent="";
+    if(pic){const im=document.createElement("img");im.alt="";im.src=pic;av.appendChild(im)}
+    else av.textContent=nm.charAt(0).toUpperCase();
+    g("pRm").hidden=!pic;
+  }
+  g("profBtn").onclick=()=>{
+    if(!user)return;
+    const p=getProf();pic=p.pic||"";g("pName").value=p.name||user.name||"";g("pErr").textContent="";
+    paint();dlg.showModal();
+  };
+  g("pName").addEventListener("input",paint);
+  g("pFile").addEventListener("change",e=>{
+    const f=e.target.files[0];e.target.value="";if(!f)return;
+    g("pErr").textContent="";
+    const u=URL.createObjectURL(f),img=new Image();
+    img.onload=()=>{
+      const S=256,c=document.createElement("canvas");c.width=c.height=S;
+      const m=Math.min(img.width,img.height),x=c.getContext("2d");
+      x.fillStyle="#fff";x.fillRect(0,0,S,S);
+      x.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,S,S);
+      URL.revokeObjectURL(u);pic=c.toDataURL("image/jpeg",.85);paint();
+    };
+    img.onerror=()=>{URL.revokeObjectURL(u);g("pErr").textContent="Could not open this image. Try a JPG or PNG."};
+    img.src=u;
+  });
+  g("pRm").onclick=()=>{pic="";paint()};
+  g("pCancel").onclick=()=>dlg.close();
+  g("pSave").onclick=()=>{
+    if(!user)return;
+    try{localStorage.setItem("wr-prof-"+user.phone,JSON.stringify({name:g("pName").value.trim().slice(0,40),pic:pic}))}
+    catch(e){g("pErr").textContent="Could not save (storage is full or blocked).";return}
+    showWho();dlg.close();
+  };
 })();
 applyRole();
 </script>
