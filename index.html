@@ -1272,8 +1272,9 @@ $("ok").onclick=()=>{
   const si=srcIdx(),E=eff();
   const a=+$("selA").value,[bi,bj]=$("selB").value.split("-").map(Number);
   const nA=E[si].r[a][0],nB=E[bi].r[bj][0];
-  swaps.push({si,a,bi,bj});saveSwaps();   // Weekend List (data) is NOT touched
-  logSwap(nA,nB,E[si],E[bi]);
+  const xid=String(Date.now()),xend=exEnd(E[si].k,E[bi].k);
+  swaps.push({si,a,bi,bj,id:xid,x:xend});saveSwaps();   // Weekend List (data) is NOT touched
+  logSwap(nA,nB,E[si],E[bi],xid,xend);
   renderHome();$("dlg").close();
   const el=$("toast");el.textContent=`Exchange complete: ${nA} ⇄ ${nB}`;el.classList.add("on");setTimeout(()=>el.classList.remove("on"),3000);
 };
@@ -1291,7 +1292,27 @@ window.addEventListener("popstate",()=>{if(currentView!=="home"){show("home",tru
 document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>show(b.dataset.v));
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{if(currentView!=="home"&&history.state&&history.state.panelView){history.back()}else{show("home",true)}});
 
+// Auto-remove completed exchanges: an exchange is complete once the later of its two weekend days has passed
+function exEnd(k1,k2){
+  const now=new Date();let max=0;
+  [k1,k2].forEach(k=>{const idx=names.indexOf(k);if(idx<0)return;
+    const diff=(idx-now.getDay()+7)%7;
+    const t=new Date(now.getFullYear(),now.getMonth(),now.getDate()+diff,23,59,59,999).getTime();
+    if(t>max)max=t});
+  return max||Date.now()}
+function purgeDone(){
+  const now=Date.now();let chL=false,chS=false;
+  log.forEach(l=>{if(!l.x){l.x=exEnd(l.da,l.db);chL=true}});
+  swaps.forEach(s=>{if(!s.x){s.x=exEnd(data[s.si]&&data[s.si].k,data[s.bi]&&data[s.bi].k);chS=true}});
+  const nl=log.filter(l=>l.x>now),ns=swaps.filter(s=>s.x>now);
+  if(nl.length!==log.length){log=nl;chL=true}
+  if(ns.length!==swaps.length){swaps=ns;chS=true}
+  if(chL){try{localStorage.setItem("wr-log",JSON.stringify(log))}catch(e){}sync("log",log)}
+  if(chS)saveSwaps();
+  return chL||chS}
+setInterval(()=>{if(purgeDone())renderHome()},60000);
 function renderHome(){
+  purgeDone();
   const d=eff()[todayIdx];
   const dt=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
   $("today").style.setProperty("--c",d.c);
@@ -1300,8 +1321,8 @@ function renderHome(){
   $("logList").innerHTML=log.length?log.map(l=>`<div class="lg"><b>${esc(l.a)}</b> &#8644; <b>${esc(l.b)}</b><div class="mut">${l.da} &#8596; ${l.db} &bull; ${esc(l.t)}</div></div>`).join(""):`<div class="mut">No weekend exchanges yet.</div>`;
 }
 let log=[];try{log=JSON.parse(localStorage.getItem("wr-log")||"[]")}catch(e){}
-function logSwap(a,b,dA,dB){
-  log.unshift({a,b,da:dA.k,db:dB.k,t:new Date().toLocaleString()});log=log.slice(0,100);
+function logSwap(a,b,dA,dB,id,x){
+  log.unshift({a,b,da:dA.k,db:dB.k,t:new Date().toLocaleString(),id,x});log=log.slice(0,100);
   try{localStorage.setItem("wr-log",JSON.stringify(log))}catch(e){}
   sync("log",log);
 }
