@@ -1302,7 +1302,7 @@ function renderHome(){
   $("today").style.setProperty("--c",d.c);
   $("today").innerHTML=`<div class="th"><div><small>${isReal?"TODAY’S WEEKEND":"UPCOMING WEEKEND"}</small><b>${d.k}</b></div><span>${dt}</span><div class="thr"><button class="exh" id="exBtn">&#8644; Exchange weekend</button><button class="exh adv" id="advBtn">&#9201; Advance exchange</button></div></div><div class="tr">${d.r.map(x=>`<div><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join("")}</div>`;
   $("exBtn").onclick=()=>openDlg(false);$("advBtn").onclick=openAdv;
-  $("logList").innerHTML=log.length?log.map(l=>`<div class="lg"><b>${esc(l.a)}</b> &#8644; <b>${esc(l.b)}</b><div class="mut">${l.da}${l.d1?" ("+fmtD(l.d1)+")":""} &#8596; ${l.db}${l.d2?" ("+fmtD(l.d2)+")":""}</div><div class="mut">${esc(l.t)}${l.exp?" &bull; auto-removes after "+fmtD(l.exp):""}</div></div>`).join(""):`<div class="mut">No weekend exchanges yet.</div>`;
+  $("logList").innerHTML=log.length?log.map(l=>`<div class="lg"><b>${esc(l.a)}</b> &#8644; <b>${esc(l.b)}</b><div class="mut">${l.da}${l.d1?" ("+fmtD(l.d1)+")":""} &#8596; ${l.db}${l.d2?" ("+fmtD(l.d2)+")":""}</div></div>`).join(""):`<div class="mut">No weekend exchanges yet.</div>`;
 }
 let log=[];try{log=JSON.parse(localStorage.getItem("wr-log")||"[]")}catch(e){}
 // ---- Exchange dates + auto-expiry: an exchange disappears once its (last) exchange day is over ----
