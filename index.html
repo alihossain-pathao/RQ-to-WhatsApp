@@ -1275,8 +1275,9 @@ $("ok").onclick=()=>{
   const si=srcIdx(),E=eff();
   const a=+$("selA").value,[bi,bj]=$("selB").value.split("-").map(Number);
   const nA=E[si].r[a][0],nB=E[bi].r[bj][0];
-  swaps.push({si,a,bi,bj});saveSwaps();   // Weekend List (data) is NOT touched
-  logSwap(nA,nB,E[si],E[bi]);
+  const d1=dayDate(si),d2=dayDate(bi),exp=d1>d2?d1:d2;   // exchange stays until the later of the two days is over
+  swaps.push({si,a,bi,bj,d1,d2,exp});saveSwaps();   // Weekend List (data) is NOT touched
+  logSwap(nA,nB,E[si],E[bi],d1,d2,exp);
   renderHome();$("dlg").close();
   const el=$("toast");el.textContent=`Exchange complete: ${nA} ⇄ ${nB}`;el.classList.add("on");setTimeout(()=>el.classList.remove("on"),3000);
 };
@@ -1295,16 +1296,34 @@ document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>show(b.dataset.v)
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{if(currentView!=="home"&&history.state&&history.state.panelView){history.back()}else{show("home",true)}});
 
 function renderHome(){
+  purge();
   const d=eff()[todayIdx];
   const dt=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
   $("today").style.setProperty("--c",d.c);
   $("today").innerHTML=`<div class="th"><div><small>${isReal?"TODAY’S WEEKEND":"UPCOMING WEEKEND"}</small><b>${d.k}</b></div><span>${dt}</span><div class="thr"><button class="exh" id="exBtn">&#8644; Exchange weekend</button><button class="exh adv" id="advBtn">&#9201; Advance exchange</button></div></div><div class="tr">${d.r.map(x=>`<div><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join("")}</div>`;
   $("exBtn").onclick=()=>openDlg(false);$("advBtn").onclick=openAdv;
-  $("logList").innerHTML=log.length?log.map(l=>`<div class="lg"><b>${esc(l.a)}</b> &#8644; <b>${esc(l.b)}</b><div class="mut">${l.da} &#8596; ${l.db} &bull; ${esc(l.t)}</div></div>`).join(""):`<div class="mut">No weekend exchanges yet.</div>`;
+  $("logList").innerHTML=log.length?log.map(l=>`<div class="lg"><b>${esc(l.a)}</b> &#8644; <b>${esc(l.b)}</b><div class="mut">${l.da}${l.d1?" ("+fmtD(l.d1)+")":""} &#8596; ${l.db}${l.d2?" ("+fmtD(l.d2)+")":""}</div><div class="mut">${esc(l.t)}${l.exp?" &bull; auto-removes after "+fmtD(l.exp):""}</div></div>`).join(""):`<div class="mut">No weekend exchanges yet.</div>`;
 }
 let log=[];try{log=JSON.parse(localStorage.getItem("wr-log")||"[]")}catch(e){}
-function logSwap(a,b,dA,dB){
-  log.unshift({a,b,da:dA.k,db:dB.k,t:new Date().toLocaleString()});log=log.slice(0,100);
+// ---- Exchange dates + auto-expiry: an exchange disappears once its (last) exchange day is over ----
+const JSN=[6,0,1,2,3,4]; // JS weekday number for Saturday..Thursday (same order as the list)
+function isoD(d){const p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())}
+function dayDate(i){const t=new Date();t.setHours(12,0,0,0);t.setDate(t.getDate()+((JSN[i]-t.getDay()+7)%7));return isoD(t)} // next date (today included) of list day i
+function fmtD(x){if(!x)return"";const q=x.split("-").map(Number);return new Date(q[0],q[1]-1,q[2]).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}
+function purge(){
+  const T=isoD(new Date());let cs=false,cl=false;
+  swaps.forEach(x=>{if(!x.exp){x.d1=dayDate(x.si);x.d2=dayDate(x.bi);x.exp=x.d1>x.d2?x.d1:x.d2;cs=true}}); // old entries without a date
+  log.forEach(l=>{if(!l.exp){const i1=order.indexOf(l.da),i2=order.indexOf(l.db);if(i1>-1&&i2>-1){l.d1=dayDate(i1);l.d2=dayDate(i2);l.exp=l.d1>l.d2?l.d1:l.d2}else l.exp=T;cl=true}});
+  const s2=swaps.filter(x=>x.exp>=T),l2=log.filter(l=>l.exp>=T);
+  if(s2.length!==swaps.length){swaps=s2;cs=true}
+  if(l2.length!==log.length){log=l2;cl=true}
+  if(cs)saveSwaps();
+  if(cl){try{localStorage.setItem("wr-log",JSON.stringify(log))}catch(e){}sync("log",log)}
+  return cs||cl}
+setInterval(()=>{if(purge())renderHome()},60000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&purge())renderHome()});
+function logSwap(a,b,dA,dB,d1,d2,exp){
+  log.unshift({a,b,da:dA.k,db:dB.k,d1,d2,exp,t:new Date().toLocaleString()});log=log.slice(0,100);
   try{localStorage.setItem("wr-log",JSON.stringify(log))}catch(e){}
   sync("log",log);
 }
