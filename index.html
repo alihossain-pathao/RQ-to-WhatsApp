@@ -178,7 +178,7 @@ html.locked,html.locked body{overflow:hidden}
 // Paste your database URL between the quotes, e.g. "https://my-project-default-rtdb.firebaseio.com"
 // Leave empty = old behaviour (this device only).
 const DB_URL="https://rider-penal-default-rtdb.firebaseio.com";
-function sync(k,v){if(window.__sync)window.__sync(k,v)}
+function sync(k,v){return window.__sync?window.__sync(k,v):Promise.resolve(false)}
 // PRIMARY OWNER: always Admin, cannot be removed or edited by anyone else,
 // and is the only one who can give/remove Admin access. Change the phone to transfer ownership.
 const OWNER_PHONE="01991103890";
@@ -1145,19 +1145,22 @@ function applyRole(){
   let fails=0,lockUntil=0;
   g("gEye").onclick=()=>{const i=g("gPass"),sh=i.type==="password";i.type=sh?"text":"password";g("gEye").textContent=sh?"Hide":"Show"};
   ["gPhone","gPass"].forEach(id=>g(id).addEventListener("input",()=>err("")));
-  g("gForm").addEventListener("submit",ev=>{
+  g("gForm").addEventListener("submit",async ev=>{
     ev.preventDefault();
     const wait=Math.ceil((lockUntil-Date.now())/1000);
     if(wait>0){err("Onek bar bhul hoyeche. "+wait+" second pore chesta korun.");return}
     const ph=normPhone(g("gPhone").value),pw=g("gPass").value;
     if(!PHONE_RE.test(ph)){err("Sothik 11 digit phone number din (01XXXXXXXXX).");g("gPhone").focus();return}
     if(!pw){err("Password din.");g("gPass").focus();return}
-    const a=findAcc(ph);   // the current password only: a changed password replaces the old one
     const pws=pw.trim()===pw?[pw]:[pw,pw.trim()];   // phone keyboards often add a trailing space
-    if(!a||!pws.some(w=>accHash(ph,w)===a.hash)){
+    const okAcc=()=>{const x=findAcc(ph);return x&&pws.some(w=>accHash(ph,w)===x.hash)?x:null};
+    let a=okAcc();
+    if(!a&&window.__pull){err("Check hocche...");await window.__pull();a=okAcc();err("")}   // fetch latest access list from cloud, then retry
+    if(!a){
+      const a0=findAcc(ph);
       g("gPass").value="";
       if(++fails>=5){fails=0;lockUntil=Date.now()+30000;err("5 bar bhul hoyeche. 30 second opekkha korun.")}
-      else{err(a?"Password thik nai.":"Ei number e kono access nei.");g("gPass").focus()}
+      else{err((a0?"Password thik nai.":"Ei number e kono access nei.")+(window.__syncErr?" ("+window.__syncErr+")":""));g("gPass").focus()}
       return}
     fails=0;user={phone:a.phone,name:a.name||"",h:a.hash,role:roleOf(a)};
     try{localStorage.setItem("wr-user",JSON.stringify(user))}catch(e){}
@@ -1318,7 +1321,8 @@ renderHome();
     g("admList").innerHTML=ACCOUNTS.map(a=>`<div class="ar"><div><b>${esc(a.name||"—")}</b><span>${esc(a.phone)}</span></div><em class="ac"><i class="rb${roleOf(a)==="admin"?" ad":""}">${a.phone===OWNER_PHONE?"OWNER":roleOf(a)==="admin"?"ADMIN":"USER"}</i>${(user&&a.phone===user.phone)||a.phone===OWNER_PHONE||(roleOf(a)==="admin"&&!isOwner())?"":`<button class="rmv" type="button" data-ph="${esc(a.phone)}">Remove</button>`}</em></div>`).join("")||`<div class="ar">Kono account nei.</div>`;
   }
   function open(){fillList();g("aOut").value="";const ao=g("aRole").querySelector('option[value="admin"]');if(ao){ao.hidden=!isOwner();ao.disabled=!isOwner()}g("aRole").value="user";dlg.showModal()}
-  g("admBtn").onclick=()=>{if(isAdmin())open()};
+  window.__refreshAdm=()=>{if(dlg.open)fillList()};
+  g("admBtn").onclick=()=>{if(isAdmin()){open();window.__pull&&window.__pull()}};
   g("admClose").onclick=()=>dlg.close();
   g("admList").addEventListener("click",e=>{
     const b=e.target.closest(".rmv");if(!b||!isAdmin())return;
@@ -1330,7 +1334,7 @@ renderHome();
         let rm=[];try{rm=JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]}catch(x){}
         if(rm.indexOf(ph)<0)rm.push(ph);
         localStorage.setItem("wr-removed",JSON.stringify(rm));
-        sync("extra",ex.filter(x=>x.phone!==ph));sync("removed",rm);
+        Promise.all([sync("extra",ex.filter(x=>x.phone!==ph)),sync("removed",rm)]).then(r=>{if(!r.every(Boolean))g("aOut").value+="\n\u26a0 Cloud e save hoy nai"+(window.__syncErr?": "+window.__syncErr:"")});
       }catch(x){g("aOut").value="Remove save hoy nai (browser storage bondho).";return}
       const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS.splice(i,1);
       try{localStorage.removeItem("wr-prof-"+ph)}catch(x){}
@@ -1338,7 +1342,7 @@ renderHome();
     });
   });
   dlg.addEventListener("close",()=>{if(location.hash==="#admin")history.replaceState(null,"",location.pathname+location.search)});
-  g("aGen").onclick=()=>{
+  g("aGen").onclick=async()=>{
     const ph=normPhone(g("aPhone").value),nm=g("aName").value.trim(),pw=g("aPass").value,role=g("aRole").value,o=g("aOut");
     if(!PHONE_RE.test(ph)){o.value="Sothik 11 digit phone number din.";return}
     if(!pw){o.value="Password din.";return}
@@ -1350,17 +1354,26 @@ renderHome();
     if(ex0&&roleOf(ex0)==="admin"&&!isOwner()){o.value="Admin account sudhu Owner bodlate parbe.";return}
     if(role==="admin"&&!isOwner()){o.value="Admin access sudhu Owner dite parbe.";return}
     const hs=accHash(ph,pw);
-    o.value="{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+(role==="admin"?",role:\"admin\"":"")+",hash:\""+hs+"\"},";
+    const line="{phone:"+JSON.stringify(ph)+(nm?",name:"+JSON.stringify(nm):"")+(role==="admin"?",role:\"admin\"":"")+",hash:\""+hs+"\"},";
     const acc={phone:ph,hash:hs};if(nm)acc.name=nm;if(role==="admin")acc.role="admin";
+    o.value="Save hocche...";
+    // 1) pull the cloud list first so we never overwrite other people's access with a stale list
+    let loc=[];try{loc=JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]}catch(e){}
+    if(window.__pull)await window.__pull();
     let ex=[];try{ex=JSON.parse(localStorage.getItem("wr-extra")||"[]")||[]}catch(e){}
+    loc.forEach(x=>{if(x&&x.phone&&!ex.some(y=>y.phone===x.phone))ex.push(x)});
     ex=ex.filter(x=>x.phone!==ph);ex.push(acc);
-    try{const rm2=(JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]).filter(x=>x!==ph);localStorage.setItem("wr-removed",JSON.stringify(rm2));sync("removed",rm2)}catch(e){}
+    let rm2=[];try{rm2=(JSON.parse(localStorage.getItem("wr-removed")||"[]")||[]).filter(x=>x!==ph);localStorage.setItem("wr-removed",JSON.stringify(rm2))}catch(e){}
     try{localStorage.setItem("wr-extra",JSON.stringify(ex))}catch(e){o.value="Save hoy nai (browser storage bondho).";return}
-    sync("extra",ex);
     const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS[i]=acc;else ACCOUNTS.push(acc);
     fillList();
     g("aPhone").value="";g("aName").value="";g("aPass").value="";g("aRole").value="user";
-    o.value="\u2713 Done! "+(nm||ph)+" er access set hoyeche.\n\nOnno device er jonno ei line ta file e paste korun:\n"+o.value;
+    // 2) push to cloud and tell the truth about whether it worked
+    const r=await Promise.all([sync("removed",rm2),sync("extra",ex)]);
+    const cloud=r.every(Boolean)
+      ?"\u2713 Cloud e save hoyeche — sob device e login kaj korbe."
+      :"\u26a0 Ei device e save hoyeche kintu CLOUD E HOY NAI"+(window.__syncErr?": "+window.__syncErr:"")+".\nTai onno device e login hobe na. Firebase Rules thik korun.";
+    o.value="\u2713 "+(nm||ph)+" er access set hoyeche.\n"+cloud+"\n\nFile e permanent korte chaile ei line ACCOUNTS e paste korun:\n"+line;
   };
   if(location.hash==="#admin")open();
 })();
@@ -1411,9 +1424,11 @@ renderHome();
   const LS={list:"wr-list",swaps:"wr-swaps",log:"wr-log",extra:"wr-extra",removed:"wr-removed"};
   const lsKey=k=>LS[k]||(k.indexOf("prof_")===0?"wr-prof-"+k.slice(5):null);
   const cur=k=>{try{return localStorage.getItem(lsKey(k))}catch(e){return null}};
-  const put=(k,v)=>fetch(base+"/"+encodeURIComponent(k)+".json",{method:"PUT",body:JSON.stringify(JSON.stringify(v))}).catch(()=>{});
+  const put=(k,v)=>fetch(base+"/"+encodeURIComponent(k)+".json",{method:"PUT",body:JSON.stringify(JSON.stringify(v))}).then(r=>{if(!r.ok){window.__syncErr="Firebase error "+r.status+" (Rules e permission nei)";return false}window.__syncErr="";return true}).catch(()=>{window.__syncErr="Internet / Firebase connect hoy nai";return false});
+  window.__pull=()=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),7000);
+    return fetch(base+".json",{signal:c.signal}).then(r=>{if(!r.ok){window.__syncErr="Firebase error "+r.status+" (Rules e permission nei)";return null}return r.json()}).then(d=>{clearTimeout(t);if(d&&typeof d==="object"){window.__syncErr="";Object.keys(d).forEach(k=>applyKey(k,d[k]))}return d}).catch(()=>{clearTimeout(t);window.__syncErr="Internet / Firebase connect hoy nai";return null})};
   let ready=false;
-  window.__sync=(k,v)=>{put(k,v)};
+  window.__sync=(k,v)=>put(k,v);
   function checkSession(){
     if(!user)return;
     const a=findAcc(user.phone);
@@ -1431,8 +1446,8 @@ renderHome();
     if(k==="list"){if(Array.isArray(v)&&v.length===6){data=v;if(!editing)render();renderHome()}}
     else if(k==="swaps"){if(Array.isArray(v)){swaps=v;renderHome()}}
     else if(k==="log"){if(Array.isArray(v)){log=v;renderHome()}}
-    else if(k==="extra"){(v||[]).forEach(a=>{if(a&&a.phone&&a.hash&&a.phone!==OWNER_PHONE){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}});checkSession()}
-    else if(k==="removed"){(v||[]).forEach(ph=>{if(ph===OWNER_PHONE)return;const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS.splice(i,1)});checkSession()}
+    else if(k==="extra"){(v||[]).forEach(a=>{if(a&&a.phone&&a.hash&&a.phone!==OWNER_PHONE){const i=ACCOUNTS.findIndex(x=>x.phone===a.phone);if(i>=0)ACCOUNTS[i]=a;else ACCOUNTS.push(a)}});checkSession();window.__refreshAdm&&window.__refreshAdm()}
+    else if(k==="removed"){(v||[]).forEach(ph=>{if(ph===OWNER_PHONE)return;const i=ACCOUNTS.findIndex(x=>x.phone===ph);if(i>=0)ACCOUNTS.splice(i,1)});checkSession();window.__refreshAdm&&window.__refreshAdm()}
     else if(k.indexOf("prof_")===0){if(user&&k==="prof_"+user.phone)showWho()}
   }
   function seed(remote){
